@@ -1,0 +1,326 @@
+#set($layout="/layout/createLayout.vm")
+<script type="text/javascript" src="/misc/js/compress_base.js"></script>
+
+<div class="span9">
+    #parse("common/chartCreateNav.vm")
+
+    <div class="report-step">
+        <h3>新增模板(图表类型)</h3>
+
+        <div>
+            <span>模板名称：</span>
+            <input id="name" type="text" maxlength="50" style="width:350px;"/>
+        </div>
+        <div>
+            <span>模板描述：</span>
+
+            <textarea id="description" maxlength="100" style="width:350px;"></textarea>
+        </div>
+        <div id="sql-step" class="step1">
+            <div class="search">
+                <a class="toggle-link" id="add-sql" href="javascript:void(0);"><i class="icon-plus"></i>增加一个SQL</a>
+
+                <div class="sql">
+                    <span>SQL:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <textarea rows="4" style="width:600px;" class="sql_text"></textarea>
+                </div>
+                <div class="random-sql">
+                    <span>随机SQL：</span>
+                    <textarea rows="4" style="width:600px;" class="sql_text"></textarea>
+                </div>
+            </div>
+        </div>
+
+
+        <div style="padding:10px;">
+            <a class="toggle-link" id="add-param" href="javascript:void(0);"><i class="icon-plus"></i>增加一个参数配置</a>
+        </div>
+        <div id="sql-params">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>参数名称</th>
+                    <th>参数类型</th>
+                    <th>参数值</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <input type="text" name="name">
+                    </td>
+                    <td>
+                        <select style="width:100px;">
+                            <option value="0">字符型</option>
+                            <option value="1">数字型</option>
+                            <option value="2">sql语句类型</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="value">
+                    </td>
+                    <td>
+                        <a class="toggle-link params-remove data-a-remove" href="javascript:void(0);"><i
+                                class="icon-plus"></i>删除</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="sort-params" style="margin-top: 40px;">
+            <h3>limit配置</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>limit起始位置</th>
+                    <th>limit显示的数量</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <input type="text" name="offset">
+                    </td>
+                    <td>
+                        <input type="text" name="count">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="step-btn">
+            <p>
+                <a class="btn btn-primary btn-large" id="sql-query" href="javascript:void(0);">下一步/导入SQL</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="report-step-2" class="report-step" style="display:none;"></div>
+    <div id="report-step-3" class="report-step" style="display:none;">
+        <div id="report-preview"></div>
+        <div>
+            <div style="margin:20px 0;">
+                <button id="edit-report-option" class="btn option-btn">编辑OPTION</button>
+            </div>
+            <div style="display:none;">
+                <button class="btn option-btn" onclick="Report.optionFormat();">格式化OPTION</button>
+                <button class="btn option-btn btn-primary" onclick="Report.optionCompress(this);">压缩OPTION</button>
+                <button id="report-refresh" class="btn option-btn">刷新</button>
+                <textarea id="report-option-text" rows="14" style="width: 800px;margin-top:10px;"></textarea>
+            </div>
+            <div class="step-btn">
+                <p>
+                    <a href="javascript:void(0);" id="option-save" class="btn btn-primary btn-large">下一步/保存模板OPTION</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/jquery/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script type="text/javascript" src="/misc/js/common.js"></script>
+<script type="text/javascript" src="/misc/js/jsformat.js"></script>
+<script type="text/javascript" src="/misc/js/report.js"></script>
+<script>
+    (function () {
+        $('.summary li').removeClass('current');
+        $('.summary li').eq(1).addClass('current');
+        $('#report-create-pic').addClass('active');
+
+        $('#add-param').click(function () {
+            var html = '<tr><td><input name="name" type="text" /></td>' +
+                    '<td><select style="width:100px;"><option value="0">字符型</option><option value="1">数字型</option><option value="2">sql语句类型</option></select></td>' +
+                    '<td><input name="value" type="text" /></td>' +
+                    '<td><a href="javascript:void(0);" class="toggle-link params-remove data-a-remove"><i class="icon-plus"></i>删除</a></td></tr>';
+            $('#sql-params table tbody').append(html);
+        });
+
+        $('.span9').delegate('.params-remove', 'click', function () {
+            $(this).closest('tr').remove();
+        });
+
+        $('#add-sql').click(function () {
+            if ($('.search').length === 10) {
+                alert('最多只能有10个SQL输入框！');
+                return;
+            }
+            var html = '<div class="search"><a class="toggle-link sql-text-remove data-a-remove " href="javascript:void(0);"><i class="icon-plus"></i>删除</a><div class="sql"><span>SQL:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <textarea rows="4" style="width:600px;" class="sql_text"></textarea></div>' +
+                    '<div class="random-sql"> <span>随机SQL：</span> <textarea rows="4" style="width:600px;" class="sql_text"></textarea></div></div>';
+            $('#sql-step').append(html);
+
+        })
+
+//    $('.sql-text-remove').click(function(){
+//     $(this).closest('div').remove();
+//    })
+        $('.span9').delegate('.sql-text-remove', 'click', function () {
+            $(this).parents('.search').remove();
+        });
+
+        function validate() {
+            if ($('#name').val().trim() == '') {
+                alert('请输入模板名称！');
+                return false;
+            }
+            for (var i = 0; i < $('.sql textarea').length; i++) {
+                if ($('.sql textarea').eq(i).val() == '') {
+                    alert('第' + i + "个sql输入为空!");
+                    return false;
+                }
+            }
+            var sql_length = $('.sql textarea').length;
+            var random_sql_length = $('.random-sql .sql_text').length;
+            var random_sql_text_length = 0;
+            $('.random-sql .sql_text').each(function () {
+                if ($(this).val() == '') {
+                    random_sql_text_length++;
+                }
+            })
+
+            if (random_sql_text_length!=0&&random_sql_text_length!=random_sql_length) {
+                alert('随机sql要么不填，要么全填！')
+                return false;
+            }
+
+
+            return true;
+        }
+
+        function getParams() {
+            var sqlText = $('.sql textarea'),
+                    sql = '';
+            for (var i = 0; i < sqlText.length; i++) {
+                var sqlTemp = sqlText.eq(i).val();
+                if (i < sqlText.length - 1) {
+                    sql += sqlTemp + ';';
+                } else {
+                    sql += sqlTemp;
+                }
+            }
+            var randomSqlText = $('.random-sql textarea'), randomSql = '';
+            for (var i = 0; i < randomSqlText.length; i++) {
+                var temp = randomSqlText.eq(i).val();
+                if (temp != "") {
+                    if (i < randomSqlText.length - 1) {
+                        randomSql += temp + ';';
+                    }
+                    else {
+                        randomSql += temp;
+                    }
+                }
+
+            }
+
+
+            var sorters = Report.getLimitInputParams('sort-params');
+            var paramsJson = JSON.stringify(utils.fgetParamsArray(getSqlParams(), sorters));
+            var params = {
+                sourceType: 1,
+                sql: sql,
+                paramsJson: paramsJson,
+                randomSql: randomSql
+            };
+            console.log(params)
+            return params;
+        }
+
+        $('#sql-query').click(function () {
+            if (!validate()) {
+                return;
+            }
+            if (!Report.inputValidate('sql-params') || !Report.inputValidate('sort-params')) {
+                return;
+            }
+            var params = getParams();
+
+
+//        var sorters = Report.getLimitInputParams('sort-params');
+//        var sql = $('#sql').val(),
+//            paramsJson = JSON.stringify(utils.fgetParamsArray(getSqlParams(), sorters));
+//        var params ={
+//            sql:sql,
+//            paramsJson:paramsJson
+//        };
+            jQuery.ajax({
+                url: '/data/query',
+                type: 'POST',
+                data: params,
+                success: function (data) {
+                    $('#report-step-2').html(data);
+                    DL.navChange(2);
+                },
+                error: function () {
+                    alert('导入SQL失败！');
+                }
+            });
+        });
+
+        // 编辑option
+        $('#edit-report-option').click(function () {
+            $('#report-option-text').closest('div').toggle('slow');
+        });
+
+        $('#report-refresh').click(function () {
+            var jsonStr = $('#report-option-text').val();
+            var params = {
+                json: jsonStr
+            };
+            utils.fgetHtml('/report/refresh', 'report-preview', params);
+        });
+
+        $('#option-save').click(function () {
+            var optionStr = $('#report-option-text').val(),
+                    id = $('#reportId').val();
+            var params = {
+                id: id,
+                option: optionStr
+            };
+            jQuery.ajax({
+                url: '/report/saveOption',
+                type: 'POST',
+                data: params,
+                dataType: 'json',
+                success: function (data) {
+                    if (data['success']) {
+                        alert('保存模板option成功！即将进入模板浏览页面。');
+                        window.location.href = '/data/view/' + id;
+                    } else {
+                        alert('保存模板option失败！');
+                    }
+                },
+                error: function () {
+                    alert('保存模板option出错！');
+                }
+            });
+        });
+
+
+    })();
+
+    function getSqlParams() {
+        var trs = $('#sql-params tbody tr'),
+                json = {};
+        for (var i = 0; i < trs.length; i++) {
+            var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                    value = trs.eq(i).find('input[name="value"]').val(),
+                    selectType = trs.eq(i).find('select').val();
+            if (selectType == 1) {
+                //数字型需要转换下
+                value = Number(value);
+            }
+//            sql语句类型需要在值中加入[sql]标注，方便后台处理
+            if(selectType==2){
+                value=value+"[sql]";
+
+            }
+            json[name] = value;
+        }
+        return json;
+    }
+</script>

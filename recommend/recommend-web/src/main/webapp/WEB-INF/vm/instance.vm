@@ -1,0 +1,81 @@
+#set($layout="/layout/indexLayout.vm")
+
+<div class="span3">
+    <div class="well" style="padding: 8px 0;">
+        <ul class="nav nav-list">
+            <li class="nav-header">我的报表</li>
+            <li>
+                <a href="/">
+                    <i class="icon-cog"></i>
+                    模板列表
+                </a>
+            </li>
+            <li class="active">
+                <a href="/instance">
+                    <i class="icon-cog"></i>
+                    实例列表
+                </a>
+            </li>
+            <li class="nav-header">报表管理</li>
+            <li>
+                <a href="/create">
+                    <i class="icon-check">
+                    </i>
+                    创建报表
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="span9">
+    <h3>
+        #if($!report)
+            模板:（$!{report.name}）的
+        #end 实例列表
+    </h3>
+    <div class="search">
+        <span>名称：</span>
+        <input id="name" type="text" />
+        <button id="search-btn" class="btn" style="width: 80px;">搜索</button>
+        #if($!report)
+            <button style="margin-left:13px;" class="btn btn-primary">新增一个实例</button>
+        #end
+    </div>
+    <div id="report-list"></div>
+</div>
+<input type="hidden" id="reportId" value="$!report.id"/>
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script type="text/javascript" src="/misc/js/common.js"></script>
+<script type="text/javascript">
+    var reportId = $('#reportId').val();
+    function queryList(page){
+        var url = '/reportInstance/list',
+            name = $('#name').val().trim();
+        var params = {
+            page:page
+        };
+        if(name != ''){
+            params.name = name;
+        }
+        if(reportId != ''){
+            params.reportId = reportId;
+        }
+
+        utils.fgetHtml(url, 'report-list', params);
+    }
+
+    queryList(1);
+
+    $('#search-btn').click(function(){
+        queryList(1);
+    });
+
+    $('.search .btn-primary').click(function(){
+        if(reportId != ''){
+            window.location.href = '/reportInstance/'+ reportId +'/add';
+        }
+    });
+
+</script>

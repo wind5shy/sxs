@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>创建报表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/misc/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/misc/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/misc/css/site.css" rel="stylesheet">
+    <link href="/misc/css/common.css" rel="stylesheet">
+    <style type="text/css">
+        .search select{margin:0 10px;}
+        td a{padding:0 5px;}
+        /*.data-config{margin-bottom:20px;padding-bottom:50px;}*/
+        .condition-config input{margin-bottom:0px;}
+        ul{list-style:none;margin:0px;padding:0px;}
+        .chart-type{display:inline-block;}
+        .chart-type li{float:left;width:270px;padding:10px;}
+        .chart-type li:hover{background-color:#eee;}
+        .drag{display:inline-block;}
+        .left li{background-color:#0dc4a3;width:200px;height:30px;margin-bottom:4px;cursor:move;border-radius:4px;-webkit-border-radius：4px;line-height:30px;padding-left:10px;}
+        .target{margin-top:20px;}
+        .target input{width:100px;display:block;}
+        .target ul{padding:0 10px;min-height:50px;}
+        .title{padding:10px 10px 0;font-weight:700;text-align:center;}
+        .temp{text-align:center;color:white;font-weight:700;line-height:30px;letter-spacing:3px;}
+        .drop-target li{background-color:#0dc4a3;width:200px;height:30px;margin-bottom:10px;cursor:move;padding-left:10px;line-height:30px;border-radius:4px;-webkit-border-radius：4px;}
+        .a-remove{float:right;margin-right:10px;color:white;font-size:14px;}
+        .message{text-align:center;margin:-10px 0 0;font-size:13px;color:#666;font-weight:100;}
+        .produce-chart{margin:20px 0;}
+        .summary a{text-decoration:blink;}
+        .summary .current{background-color:#D2E9FF;}
+        .thumbnail:hover{text-decoration:blink;}
+        .step2{display:none;}
+        .span3{position: relative;width:190px;}
+        .layout-inner{width:190px;height:158px;border:6px solid #006dcc;left:-6px;top:-6px;position:absolute;opacity:0.7;border-radius:4px;-webkit-border-radius：4px;}
+        #errormsg p{border:1px solid #d4d4d4;border-radius:4px;-webkit-border-radius：4px;width:300px;text-align: center;padding: 20px;margin: 0 auto;color: red}
+        .query-data{max-height: 400px;overflow: scroll;}
+        a:hover{text-decoration:blink;}
+        .data-a-remove i{background-position:-312px 0;}
+        .step-btn{margin-top:50px;text-align:right;}
+        .step-btn a{margin-left:12px;}
+        .option-btn{margin-right:20px;width:125px;}
+        .dataSource-btn{margin-right:20px;width:80px;}
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand" href="#">
+                    Data Visualization System V1.3
+                </a>
+                <div class="nav-collapse">
+                    <ul class="nav pull-right">
+                        <li>
+                            <a href="javascript:void(0)" id="login">登录</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" id="logout">退出</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        #parse("common/navcommon.vm")
+        $screen_content
+    </div>
+</div>
+<script type="text/javascript">
+var host = window.location.host;
+$(function(){
+	jQuery.ajax({
+		url:"/user/name",
+		type: 'POST',
+        dataType: 'json',
+        success: function (data) {
+        	console.log(data);
+              if(data.name != null)  jQuery("#login").html(data.name);
+              else jQuery("#login").html("登录");
+         }
+	});
+	jQuery("#login").click(function(){
+		if(jQuery(this).html() == '登录')
+		 window.location.href = "http://dp.nong12.com/loginControl/login.do?returnurl=http://dvs.nong12.com/";
+	 });
+	
+	jQuery("#logout").click(function(){
+		deleteVisualCookie();
+		window.location.href = "http://dp.nong12.com/loginControl/login.do?returnurl=http://dvs.nong12.com/";;
+	});
+	
+	 function deleteVisualCookie(){
+		  var current_host = host.substring(host.indexOf("/"));
+	      document.cookie='SessionId=; path=/; domain=' + current_host;
+	    }
+});
+</script>	
+</body>
+</html>

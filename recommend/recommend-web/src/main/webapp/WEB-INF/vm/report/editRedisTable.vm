@@ -1,0 +1,324 @@
+#set($layout="/layout/createLayout.vm")
+
+<div class="span9">
+    <div  class="report-step">
+        <h3>修改模板(数据类型)</h3>
+        <div>
+            <span>模板名称：</span>
+            <input id="name" type="text" maxlength="50" style="width:350px;"  value="$!report.name" />
+        </div>
+        <div>
+            <span>模板描述：</span>
+            <textarea id="description" maxlength="100" style="width:350px;">$!report.description</textarea>
+        </div>
+        <div id="sql-step">
+            <div class="search">
+                <a class="toggle-link" id="add-redis" href="javascript:void(0);"><i
+                        class="icon-plus"></i>增加一个redis模版</a>
+                <br/>
+                #foreach($patternData in $!report.patternDatas)
+                    <div class="redis">
+                        <div class="redis-select" style="float: left">
+                            <span>redis模版类型</span>
+                            <select style="width:150px; ">
+                                <option value="redis1" #if($!patternData.type == 1) selected #end>表模版</option>
+                                <option value="redis2" #if($!patternData.type == 2) selected #end>单记录模版</option>
+                                <option value="redis3" #if($!patternData.type == 3) selected #end>多记录模版</option>
+                            </select>
+                        </div>
+                        <div class="redis-ta" id="redis1" style="  margin-left: 400px;">
+                            <span>元数据key &nbsp; &nbsp;&nbsp;</span>
+                            <textarea rows="1" style="width:300px;">$!patternData.metaKey</textarea>
+                        </div>
+                        <div class="redis-ta" id="redis2" style=" margin-left: 400px;">
+                            <span>#if($!patternData.type != 3) 操作类型key&nbsp;&nbsp; #end #if($!patternData.type == 3) 记录索引key&nbsp;&nbsp; #end</span>
+                            <textarea rows="1" style="width:300px;">$!patternData.handleKey</textarea>
+                        </div>
+                        <div class="redis-ta" id="redis3" style="  margin-left: 400px;">
+                            <span>数据key  &nbsp; &nbsp; &nbsp; &nbsp;</span>
+                            <textarea rows="1" style="width:300px;" class="sql_text">$!patternData.valueKey</textarea>
+                        </div>
+                        <hr>
+                    </div>
+                #end
+
+            </div>
+        </div>
+    </div>
+    <div style="padding:10px;">
+        <a href="javascript:void(0);" id="add-param" class="toggle-link"><i class="icon-plus"></i>增加一个参数配置</a>
+    </div>
+    <div id="params-table">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>参数名称</th>
+                <th>参数类型</th>
+                <th>参数值</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            #foreach($key in $!params.keySet())
+                <tr>
+                    <td>
+                        <input name="name" type="text" value="$!key" />
+                    </td>
+                    <td>
+                        <select style="width:100px;">
+                            <option value="0" #if($!vmUtils.objectType($!params.get($!key)) == 0) selected #end>字符型</option>
+                            <option value="1" #if($!vmUtils.objectType($!params.get($!key)) == 1) selected #end>数字型</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input name="value" type="text" value="$!params.get($!key)" />
+                    </td>
+                    <td>
+                        <a href="javascript:void(0);" class="toggle-link params-remove data-a-remove"><i class="icon-plus"></i>删除</a>
+                    </td>
+                </tr>
+            #end
+            </tbody>
+        </table>
+    </div>
+    <div style="margin-top:40px;">
+        <button id="sql-query" class="btn" style="width: 130px;">导入所有SQL</button>
+    </div>
+    <div id="data-conf"></div>
+    <div style="margin-top: 40px;display:none;">
+        <p>
+            <a class="btn btn-primary btn-large" id="report-btn" href="javascript:void(0);">保存报表模板</a>
+        </p>
+    </div>
+</div>
+<input type="hidden" value="$!report.id" id="reportId" />
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script>
+    (function(){
+        $('.redis-select').change(function () {
+            var this_ = $(this)
+            var dd = this_.siblings();
+
+            for (var i = 0; i < dd.size(); i++) {
+                dd.eq(i).remove();
+            }
+            var template = this_.find("option:selected").val();
+            choiceRedisTemplate(this_, template);
+        })
+
+        function choiceRedisTemplate(_this, template) {
+            if (template == 'redis1') {
+                _this.parents('div').eq(0).append('<div class="redis-ta"  id="redis1"  style="  margin-left: 400px;"> <span>元数据key &nbsp;&nbsp; &nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div > <div class="redis-ta"  id="redis2"  style="  margin-left: 400px;"> <span>操作类型key&nbsp;&nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div> <div  id="redis3" class="redis-ta"  style="  margin-left: 400px;"> <span>数据key &nbsp; &nbsp; &nbsp; &nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div><hr>')
+            }
+            else if (template == 'redis2') {
+                _this.parents('div').eq(0).append('<div class="redis-ta"  id="redis1"  style="  margin-left: 400px;"> <span>元数据key &nbsp;&nbsp; &nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div > <div class="redis-ta"  id="redis2"  style="  margin-left: 400px;"> <span>操作类型key&nbsp;&nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div>  <div  id="redis3" class="redis-ta"  style="  margin-left: 400px;"> <span>数据key &nbsp; &nbsp; &nbsp; &nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div><hr>')
+            }
+            else {
+                _this.parents('div').eq(0).append('<div class="redis-ta"  id="redis1"  style="  margin-left: 400px;"> <span>元数据key &nbsp;&nbsp; &nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div > <div class="redis-ta"  id="redis2"  style="  margin-left: 400px;"> <span>记录索引key&nbsp;&nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div> <div  id="redis3" class="redis-ta"  style="  margin-left: 400px;"> <span>数据key &nbsp; &nbsp; &nbsp; &nbsp;</span> <textarea rows="1" style="width:300px;"></textarea></div><hr>')
+            }
+
+
+        }
+
+        $('#add-redis').click(function () {
+            if ($('.redis').length === 3) {
+                alert('最多只能有3个SQL输入框！');
+                return;
+            }
+            var div_redis = '<div class="redis">   <div class="redis-select"  style="float: left" >  <span>redis模版类型</span> <select style="width:150px; ">' +
+                    '<option value="redis1">表模版</option> <option value="redis2">单记录模版</option>  <option value="redis3">多记录模版</option> </select>' +
+                    '</div>  <div class="redis-ta"  id="redis1" style="  margin-left: 400px;" <span>元数据key &nbsp; &nbsp;&nbsp;&nbsp;</span><textarea rows="1"  style="width:300px;"></textarea>' +
+                    '</div > <div  class="redis-ta"  id="redis2" style=" margin-left: 400px;"> <span>操作类型key&nbsp;&nbsp;</span><textarea rows="1" style="width:300px;"></textarea>   </div> <div class="redis-ta"  id="redis3" style="  margin-left: 400px;">  ' +
+                    '<span>数据key &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</span> <textarea rows="1" style="width:300px;" class="sql_text"></textarea>  </div>      <a class="toggle-link del-redis data-a-remove"  href="javascript:void(0);" style="margin-left: 500px;"><i   class="icon-plus"></i>删除</a>  <hr>   </div>';
+            $(this).closest('div').append(div_redis);
+            console.log($(this).closest('div').children('div:last').html())
+            $(this).closest('div').children('div:last').find('.redis-select').bind('change', function () {
+                var this_ = $(this)
+                var dd = this_.siblings();
+
+                for (var i = 0; i < dd.size(); i++) {
+                    dd.eq(i).remove();
+                }
+                var template = this_.find("option:selected").val();
+                choiceRedisTemplate(this_, template);
+            })
+
+        })
+
+        $('.span9').delegate('.del-redis', 'click', function () {
+            $(this).closest('div').remove();
+        });
+
+
+        $('#report-create-data').addClass('active');
+
+
+
+        $('#add-param').click(function(){
+            var html = '<tr><td><input name="name" type="text" /></td>' +
+                    '<td><select style="width:100px;"><option value="0">字符型</option><option value="1">数字型</option></select></td>' +
+                    '<td><input name="value" type="text" /></td>' +
+                    '<td><a href="javascript:void(0);" class="toggle-link params-remove data-a-remove"><i class="icon-plus"></i>删除</a></td></tr>';
+            $('#params-table table tbody').append(html);
+        });
+
+        $('.span9').delegate('.params-remove', 'click', function (){
+            $(this).closest('tr').remove();
+        });
+
+        function validate() {
+            if ($('#name').val().trim() == '') {
+                alert('请输入模板名称！');
+                return false;
+            }
+            var emptyCheck=true;
+            $('.redis').each(function () {
+                var redisTpye = $(this).find('.redis-select option:selected').val();
+                console.log(redisTpye+"_redisType");
+//           只有 多记录模版，记录索引Key可以为空
+                if (redisTpye != 'redis3') {
+                    var bbb = true;
+                    $(this).find('.redis-ta textarea').each(function () {
+                        if ($(this).val() == '') {
+                            bbb = false;
+                            return false;
+                        }
+                    })
+                    if(!bbb){
+                        emptyCheck=false;
+                        return false;
+                    }
+
+                }
+            })
+            if(!emptyCheck){
+                alert('redisKey输入不能为空!');
+                return false;
+            }
+            return true;
+
+//
+//        for (var i = 0; i < $('.redis-ta textarea').length; i++) {
+//            if ($('.redis-ta textarea').eq(i).val() == '') {
+//                alert('redisKey输入不能为空!');
+//                return false;
+//            }
+//        }
+//        return true;
+        }
+
+        function getParams() {
+            var redisGroup = [];
+            for (var i = 0; i < $('.redis').size(); i++) {
+                var redisObject = $('.redis').eq(i);
+                var selectType = redisObject.find('option:selected').val();
+                var type;
+                if (selectType == 'redis1') {
+                    type = 1
+                }
+                else if (selectType == 'redis2') {
+                    type = 2
+                }
+                else {
+                    type = 3
+                }
+                var metaKey = redisObject.find('#redis1 textarea').val();
+                var handleKey = redisObject.find('#redis2 textarea').val();
+                var valueKey = redisObject.find('#redis3 textarea').val();
+                var json = {
+                    metaKey: metaKey,
+                    handleKey: handleKey,
+                    valueKey: valueKey,
+                    type: type
+                }
+                redisGroup.push(json);
+            }
+            var trs = $('#params-table tbody tr'),
+                    json = {};
+            for(var i=0;i<trs.length;i++){
+                var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                        value = trs.eq(i).find('input[name="value"]').val(),
+                        selectType = trs.eq(i).find('select').val();
+                if(selectType == 1){
+                    value = Number(value);
+                }
+                json[name]=value;
+            }
+
+            var jsonStr = JSON.stringify(utils.fgetParamsArray(json));
+
+            var name = $('#name').val().trim(),
+                    description = $('#description').val();
+         var   id = $('#reportId').val();
+            var params = {
+                id:id,
+                name:name,
+                description:description,
+                opExpr:JSON.stringify(redisGroup),
+                type:3,
+                paramsJson:jsonStr,
+                params:jsonStr,
+                sourceType:6
+            };
+            var singleRedis=1
+            var select=$('.redis').eq(0).find('option:selected').val();
+            if(select=='redis2'){
+                singleRedis=2;
+            }
+            params.singleRedis=singleRedis;
+
+            return params;
+        }
+
+        // 导入SQL
+        $('#sql-query').click(function(){
+            if(!validate()){
+                return;
+            }
+            var params = getParams();
+            jQuery.ajax({
+                url:'/report/getSqlData',
+                type:'POST',
+                data:params,
+                success:function(data){
+                    $('#data-conf').html(data);
+                    if($('.errorMsg').length == 0){
+                        $('#report-btn').closest('div').show();
+                    }else{
+                        $('#report-btn').closest('div').hide();
+                    }
+                },
+                error:function(){
+                    $('#data-conf').html("");
+                    alert('导入SQL失败！');
+                }
+            });
+
+        });
+
+        // 保存模板
+        $('#report-btn').click(function() {
+            if(!validate()){
+                return;
+            }
+            var params = getParams();
+            jQuery.ajax({
+                url:'/report/doSaveReport',
+                type:'POST',
+                data:params,
+                dataType:'json',
+                success:function(data){
+                    if(data.success){
+                        alert('保存数据类型模板成功！将前往模板列表。');
+                        window.location.href = '/datas';
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+    })();
+</script>

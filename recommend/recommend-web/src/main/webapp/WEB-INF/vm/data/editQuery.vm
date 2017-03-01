@@ -1,0 +1,439 @@
+#if($!data.size()>0)
+<h3>数据结果</h3>
+    #foreach($table in $data)
+    <div class="step1 query-data">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                #foreach($th in $!table.metas)
+                    <th>$!th.get("name")</th>
+                #end
+            </tr>
+            </thead>
+            <tbody>
+                #foreach($tr in $!table.datas)
+                <tr>
+                    #foreach($td in $!tr)
+                        <td>$!td</td>
+                    #end
+                </tr>
+                #end
+            </tbody>
+        </table>
+    </div>
+    #end
+<h3><a id="hide-random" href="javascript:void(0);">随机数据结果</a></h3>
+<div id="random-datas">
+    #foreach($table in $randomData)
+        <div class=" random-data">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    #foreach($th in $!table.metas)
+                        <th>$!th.get("name")</th>
+                    #end
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($tr in $!table.datas)
+                    <tr>
+                        #foreach($td in $!tr)
+                            <td>$!td</td>
+                        #end
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+    #end
+</div>
+
+
+<div class="data-config step1">
+    <h3>选择报表类型</h3>
+    <ul class="thumbnails">
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="LINE">
+                <img src="/misc/img/line1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>折线图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="BAR">
+                <img src="/misc/img/bar1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>柱状图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="SCATTER">
+                <img src="/misc/img/scatter1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>散点图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="PIE">
+                <img src="/misc/img/pie1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>饼状图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="K">
+                <img src="/misc/img/k1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>k线图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="FUNNEL">
+                <img src="/misc/img/funnel1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>漏斗图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="CHORD">
+                <img src="/misc/img/chord1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>和弦图</h5>
+                </div>
+            </a>
+        </li>
+
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="FORCE">
+                <img src="/misc/img/force1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>力导向布局图</h5>
+                </div>
+            </a>
+        </li>
+        <li class="span3">
+            <a href="javascript:void(0);" class="thumbnail" type="MAP">
+                <img src="/misc/img/map1.png" alt=""/>
+
+                <div class="caption">
+                    <h5>地图</h5>
+                </div>
+            </a>
+        </li>
+    ##        <li class="span3">
+    ##            <a href="javascript:void(0);" class="thumbnail" type="TABLE">
+    ##                <img src="/misc/img/table.png" alt=""/>
+    ##                <div class="caption">
+    ##                    <h5>表格</h5>
+    ##                </div>
+    ##            </a>
+    ##        </li>
+    </ul>
+</div>
+<div id="drag-conf" class="data-config step1" style="display: none;">
+    <h3>选择字段</h3>
+
+    <div class="drag">
+        #foreach($table in $data)
+            #set($i=$velocityCount)
+            <div class="left" style="float: left; margin-right: 20px;">
+                <ul>
+                    SQL结果字段  $i
+                    #foreach($th in $!table.metas)
+                        <li table=$i name="$!th.get("name")" type="$!th.get("type")">$!th.get("name") ($!th.get("type")
+
+                        </li>
+                    #end
+                </ul>
+            </div>
+        #end
+        <div class="left" style="float: left; margin-right: 20px;">
+            <ul>
+                空白字段补齐
+                <li>空白字段</li>
+
+            </ul>
+
+        </div>
+        <div class="target" id="typeConf" style="display: inline-block"></div>
+        <div class="target" id="errormsg" style="height:55px;"></div>
+    </div>
+    <div id="drag-params">
+        <div style="padding:10px;">
+            <a class="toggle-link add-param" href="javascript:void(0);"><i class="icon-plus"></i>增加一个参数配置</a>
+        </div>
+        <div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>参数名称</th>
+                    <th>参数值</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($key in $!names.keySet())
+                    <tr>
+                        <td>
+                            <input type="text" name="name" value="$!key"/>
+                        </td>
+                        <td>
+                            <input type="text" name="value" value="$!names.get($!key)"/>
+                        </td>
+                        <td>
+                            <a class="toggle-link params-remove data-a-remove" href="javascript:void(0);"><i
+                                    class="icon-plus"></i>删除</a>
+                        </td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="step-btn" style="display:none;">
+    <p>
+        <a class="btn btn-large" onclick="DL.editNavChange(0);" href="javascript:void(0);">上一步</a>
+        #if($!report.state == 2)
+		<a class="btn btn-primary btn-large" id="tostep3" href="javascript:void(0);">下一步/保存模板</a>
+		#end
+    </p>
+</div>
+
+##   sql可能有单引号
+    #if($!sourceType==1)
+    <span id="ddd" style="display: none" sql="$!{opExpr}"></span>
+    #else
+    ##        Redis json参数可能有双引号
+    <span id="ddd" style="display: none" sql='$!{opExpr}'></span>
+    #end
+<input type="hidden" id="reportId" value="$!report.id"/>
+<input type="hidden" id="current-type"/>
+
+
+<script type="text/javascript">
+(function () {
+    $('#random-datas').hide()
+
+    var currentType
+    $('.thumbnails li').click(function () {
+        if ($(this).find('.layout-inner').size() == 0) {
+            $('.layout-inner').remove();
+            $(this).append('<div class="layout-inner"></div>');
+            var type = $(this).find('a').attr('type');
+            currentType = type
+            $('#current-type').val(type);
+            if (utils.typeConf[type] != '') {
+                var url = '/data/' + utils.typeConf[type] + 'config';
+                utils.fgetHtmlsync(url, 'typeConf');
+            } else {
+                $('#typeConf').html('');
+            }
+            $('#drag-conf').show();
+            $('#report-step-2 .step-btn').show();
+        }
+    });
+
+    var chartType = '$!chartTypeStr';
+    if (chartType != '') {
+        $('.thumbnails li').each(function () {
+            if (chartType == $(this).find('a').attr('type')) {
+                $(this).trigger('click');
+                return false;
+            }
+        });
+    }
+
+    // 加载之前拖拽的数据
+    var json = '$!report.chartConf';
+    if (json != '') {
+        var conf = eval('(' + json + ')');
+        console.log(conf);
+        var groups = conf.groups;
+        var groupArray = [];
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            groupArray.push(group);
+        }
+        if (chartType == 'FORCE'||chartType=='CHORD') {
+            editMultyGroups(groupArray);
+        }
+        else {
+            editGroups(groupArray, 'wctable', chartType);
+        }
+
+    }
+    $('#hide-random').click(function () {
+        var random = $('#random-datas');
+        if (random.is(":hidden")) {
+            random.show();
+        }
+        else {
+            random.hide();
+        }
+
+
+    })
+
+    function editMultyGroups(groups) {
+        var len = $('.multy-table td').length;
+        var datas = groups[0].datas;
+        console.log(len);
+        console.log("forcedatas===")
+        console.log(datas);
+        var i = 0;
+        $('.multy-table td').each(function (index) {
+            var name = datas[i].tableFiled;
+            var ultype = datas[i].dimType;
+            if (name != null) {
+                dataType = datas[i].dataType,
+                table = datas[i].tableIndex;
+                $(this).find('ul').append('<li table="' + table + '"  type="' + dataType + '" name="' + name + '"><span>' + name + '(' + dataType + ')</span><a class="a-remove" href="javascript:void(0);">X</a></li>');
+            }
+            else {
+                $(this).find('ul').append('<li table="undefined"  type="undefined" name="undefined"><span>空白字段</span><a class="a-remove" href="javascript:void(0);">X</a></li>');
+            }
+            $(this).find('ul').attr('type', ultype);
+            i++;
+
+        })
+
+
+    }
+
+
+    function editGroups(groups, tableId, type) {
+        tableId = tableId || 'wctable';
+        var lenRow = groups.length;
+        var lenColumn = $('#' + tableId + ' tbody td').length;
+        for (var i = 0; i < lenRow; i++) {
+            var obj = groups[i];
+            $('#' + tableId + ' tbody td:last').find('ul').append('<li><input type="text" value="' + obj.name + '"></li>');
+            var datas = obj.datas;
+//               为了兼容以前的代码，如果只有 X,Y1，自动补Y2
+            if ((type == 'LINE' || type == 'BAR') && datas.length == 2) {
+                datas.push({
+                    dimtype: "Y2"
+                })
+            }
+            console.log(datas);
+            for (var j = 0; j < lenColumn - 1; j++) {
+                var name = datas[j].tableFiled;
+                var ultype = datas[j].dimType;
+                if (name != null) {
+                    dataType = datas[j].dataType,
+                            table = datas[j].tableIndex;
+                    $('#' + tableId + ' tbody td').eq(j).find('ul').append('<li table="' + table + '"  type="' + dataType + '" name="' + name + '"><span>' + name + '(' + dataType + ')</span><a class="a-remove" href="javascript:void(0);">X</a></li>');
+                }
+                else {
+                    $('#' + tableId + ' tbody td').eq(j).find('ul').append('<li table="undefined"  type="undefined" name="undefined"><span>空白字段</span><a class="a-remove" href="javascript:void(0);">X</a></li>');
+                }
+                $('#' + tableId + ' tbody td').eq(j).find('ul').attr('type', ultype);
+
+            }
+        }
+    }
+
+    $('#tostep3').click(function () {
+        if (dragParamsValidate() && Report.dragValidate()) {
+            var params;
+            var ddd = $('#ddd').attr('sql');
+            params = Report.getReportParams('wctable', ddd,$!sourceType);
+            console.log(params)
+            jQuery.ajax({
+                url: '/report/doSaveReport',
+                type: 'POST',
+                dataType: 'json',
+                data: params,
+                success: function (data) {
+                    if (data.success) {
+                        $('#reportId').val(data['reportId']);
+                        alert('保存报表模板成功！');
+                        utils.fgetHtmlsync('/report/preview/' + data['reportId'], 'report-preview');
+                        $('#report-option-text').html($('#view').html());
+                        DL.editNavChange(2);
+                    } else {
+                        alert('保存报表模板配置失败!' + data.message);
+                    }
+                }
+            });
+        }
+    });
+
+
+    /*     function getGroups(tableId){
+             tableId = tableId || 'y1-table';
+             var groups = [],
+                     lenRow = $('#'+tableId +' tbody td:first').find('li').length,
+                     lenColumn = $('#'+tableId +' tbody td').length;
+             for(var i =0 ;i<lenRow;i++){
+                 var obj={};
+                 obj.name = $('#'+tableId +' tbody td:last').find('input').eq(i).val();
+                 obj.datas = [];
+                 for(var j = 0;j<lenColumn-1;j++){
+                     obj.datas.push({
+                         tableIndex:1,
+                         tableFiled:$('#'+tableId +' tbody td').eq(j).find('li').eq(i).attr('name'),
+                         dataType:$('#'+tableId +' tbody td').eq(j).find('li').eq(i).attr('type'),
+                         dimType:$('#'+tableId +' tbody td').eq(j).find('ul').attr('type')
+                     });
+                 }
+                 groups.push(obj);
+             }
+             return groups;
+         }*/
+
+    $('#drag-params .add-param').click(function () {
+        var html = '<tr><td><input name="name" type="text" /></td>' +
+                '<td><input name="value" type="text" /></td>' +
+                '<td><a href="javascript:void(0);" class="toggle-link params-remove data-a-remove"><i class="icon-plus"></i>删除</a></td></tr>';
+        $('#drag-params table tbody').append(html);
+    });
+    $('#drag-params').delegate('.params-remove', 'click', function () {
+        $(this).closest('tr').remove();
+    });
+
+    function dragParamsValidate() {
+        var trs = $('#drag-params tbody tr');
+        for (var i = 0; i < trs.length; i++) {
+            var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                    value = trs.eq(i).find('input[name="value"]').val();
+            if (name == '' || value == '') {
+                alert('请输入参数名称和值！');
+                return false;
+            }
+        }
+        return true;
+    }
+
+})();
+
+function getDragParams() {
+    var trs = $('#drag-params tbody tr'),
+            json = {};
+    for (var i = 0; i < trs.length; i++) {
+        var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                value = trs.eq(i).find('input[name="value"]').val();
+        json[name] = value;
+    }
+    return json;
+}
+</script>
+
+#end
+

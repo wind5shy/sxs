@@ -1,0 +1,96 @@
+<style type="text/css">
+    .drop-target li{width: 160px;}
+    #drop-name input{width: 70px;}
+    .target table{margin-left:-100px;}
+</style>
+
+<div id="tables">
+<table id=wctable class="table table-bordered table-striped table-map">
+    <thead>
+    <th style="width:120px;">
+        <p class="title">地名</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:100px;">
+        <p class="title">地名值</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:100px;">
+        <p class="title">自定义地名</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:100px;;">
+        <p class="title">自定义地名经度</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:100px;">
+        <p class="title">自定义地名纬度</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:100px;">
+        <p class="title">标注点</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:100px;">
+        <p class="title">标注点值</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th>
+        <p class="title">名称</p>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="container1">
+            <ul class="drop-target" type="NAME" style="width: 120px;"></ul>
+        </td>
+        <td class="container2">
+            <ul class="drop-target" type="VALUE" style="width: 120px;"></ul>
+        </td>
+        <td class="container3">
+            <ul class="drop-target" type="GEO_NAME" style="width: 120px;"></ul>
+        </td>
+        <td class="container4">
+            <ul class="drop-target" type="GEO_VALUE1" style="width: 120px;"></ul>
+        </td>
+
+        <td class="container5">
+        <ul class="drop-target" type="GEO_VALUE2" style="width: 120px;"></ul>
+    </td>
+        <td class="container6">
+            <ul class="drop-target" type="POINT_NAME" style="width: 120px;"></ul>
+        </td>
+        <td class="container7">
+            <ul class="drop-target" type="POINT_VALUE" style="width: 120px;"></ul>
+        </td>
+
+        <td>
+            <ul id="drop-name"></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+    function validateDefKV(){
+        var groupsLength = $('.drag tbody td:first').find('li').length;
+        if(groupsLength > 3){
+            return '该类型最多只能拖入3组配置！';
+        }
+        var dataType = $('.drag tbody td:first').find('li:first').attr('type');
+        if(dataType != 'STRING'){
+            return 'NAME轴只能拖入字符串类型！';
+        }
+    }
+//     var size=  $('.table-map .container').size();
+//    var target1=[];
+//    for(var i=0;i<size;i++){
+//        target1.push($('.table-map .container').eq(i));
+//    }
+//    console.log(target1)
+
+
+    var target = ['.container1','.container2','.container3','.container4','.container5','.container6','.container7'];
+    Report.dragEvent(target,"drop-name","map");
+</script>

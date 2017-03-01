@@ -1,0 +1,41 @@
+<div class="span3" style="width: 200px;">
+    <div class="well" style="padding: 8px 0;">
+        <ul class="nav nav-list">
+            <li class="nav-header">模板列表</li>
+            <li id="report-list-pic">
+                <a href="/">
+                    <i class="icon-picture"></i>
+                    图表类型
+                </a>
+            </li>
+            <li id="report-list-data">
+                <a href="/datas">
+                    <i class="icon-list-alt"></i>
+                    数据类型
+                </a>
+            </li>
+            <li class="nav-header">创建模板</li>
+            <li id="report-create-pic">
+                <a href="/create">
+                    <i class="icon-picture">
+                    </i>
+                    图表类型
+                </a>
+            </li>
+            <li id="report-create-data">
+                <a href="/report/createTable">
+                    <i class="icon-list-alt">
+                    </i>
+                    数据类型
+                </a>
+            </li>
+            <li class="nav-header">系统管理</li>
+            <li id="cache-manage">
+                <a href="/cache/manage">
+                    <i class="icon-list-alt"></i>
+                   缓存管理
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

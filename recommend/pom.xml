@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.shixiseng.recommend</groupId>
+	<artifactId>recommend</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+	<name>recommend</name>
+
+	<modules>
+		<module>recommend-common</module>
+		<module>recommend-service</module>
+		<module>recommend-web</module>
+	</modules>
+
+	<properties>
+		<jdk.version>1.6</jdk.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+		<spring.version>3.2.14.RELEASE</spring.version>
+		<log4j.version>1.2.17</log4j.version>
+	</properties>
+
+	<!-- 打包配置信息 -->
+	<profiles>
+		<profile>
+			<!-- 开发环境 -->
+			<id>develop</id>
+			<!-- 默认 -->
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- 日志 -->
+				<recommend.log.level>DEBUG</recommend.log.level>
+				<recommend.log.path>/sxs/logs</recommend.log.path>
+				<!--打包编码 -->
+				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+				<!--service打包编码 -->
+				<service.package>develop</service.package>
+				<!--项目自定义属性 -->
+				<redis.url>redis://127.0.0.1</redis.url>
+				<user.size>30</user.size>
+				<resume.size>30</resume.size>
+				<intern.size>30</intern.size>
+				<intern.content.size>30</intern.content.size>
+			</properties>
+		</profile>
+		<profile>
+			<!-- 生产环境 -->
+			<id>product</id>
+			<properties>
+				<!-- 日志 -->
+				<recommend.log.level>DEBUG</recommend.log.level>
+				<recommend.log.path>/sxs/logs</recommend.log.path>
+				<!--打包编码 -->
+				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+				<!--service打包编码 -->
+				<service.package>product</service.package>
+				<!--项目自定义属性 -->
+				<redis.url>redis://127.0.0.1</redis.url>
+			</properties>
+		</profile>
+	</profiles>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>jdk.tools</groupId>
+				<artifactId>jdk.tools</artifactId>
+				<version>1.7</version>
+				<scope>system</scope>
+				<systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.velocity</groupId>
+				<artifactId>velocity-tools</artifactId>
+				<version>2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-asm</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-expression</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.1.3</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>redis.clients</groupId>
+				<artifactId>jedis</artifactId>
+				<version>2.4.2</version>
+			</dependency>
+	
+
+			<!-- google sets,maps -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>14.0.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.3</version>
+			</dependency>
+			<!-- JSON -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>fastjson</artifactId>
+				<version>1.1.43</version>
+			</dependency>
+
+			<!-- 单元测试 -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.5</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${spring.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus</groupId>
+				<artifactId>jackson-all</artifactId>
+				<version>1.8.5</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<!-- 插件管理 -->
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!-- war插件 -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.5.1</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<!-- 配置构建时忽略测试用例 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<skipTests>true</skipTests>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

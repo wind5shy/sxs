@@ -1,0 +1,74 @@
+
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script type="text/javascript" src="/misc/js/common.js"></script>
+<script type="text/javascript" src="/misc/wbox/wbox.js"></script>
+<link rel="stylesheet" type="text/css" href="/misc/wbox/wbox.css">
+<link rel="stylesheet" type="text/css" href="/misc/css/bootstrap.min.css">
+
+
+<form>
+    <div id="tagDiv">
+        <span class="span">报表标签: </span>
+        <br>
+          #foreach(${otherTag} in $!{otherTags})
+              <input type="checkbox" name="otherTags" style="height:18px; width:20px" value=$!{otherTag.name} >
+               <span>$!{otherTag.name}</span>
+
+          #end
+    </div>
+    <br>
+  <span>请输入你要添加的自定义标签，以逗号分隔</span>
+    <br>
+  <textarea id="newTags"  style="width:500px; height: 100px;"></textarea>
+    <br>
+##    <button id="js_save" class="btn js-btn"  style="float: right; margin-right: 40px;">保存</button>
+    <button id="js_return" class="btn js-btn" style="float: right; margin-right: 40px;">取消</button>
+    <a id="js_save" href="javascript:void(0); " reportId=$!{report.id}>增加</a>
+  </form>
+
+
+<script type="text/javascript">
+    $('#js_save').click(function(){
+        var reportId=$!{reportId};
+        var otherTagNames=$('#newTags').val();
+        var newTagNameArray=[];
+        $('input[name="otherTags"]:checked').each(function(){
+            newTagNameArray.push($(this).val());
+        })
+        if(otherTagNames==''&&newTagNameArray.length==0){
+            alert('请选择要添加的标签，或者自定义输入!')
+            return;
+        }
+        var newTagNames;
+        if(newTagNameArray.length>0){
+            newTagNames=newTagNameArray.join();
+        }
+
+
+        var params={
+            reportId:reportId,
+            otherTagNames:otherTagNames,
+            newTagNames:newTagNames
+        }
+        jQuery.ajax({
+            url:'/report/saveNewTags.html',
+            type:'POST',
+            dataType:'json',
+            data:params,
+            success:function(data){
+              window.location.href="/"
+            },
+            error:function(data){
+                alert("fall")
+            }
+
+        })
+
+
+
+
+    })
+
+</script>

@@ -1,0 +1,75 @@
+#set($layout="/layout/indexLayout.vm")
+
+#parse("common/navcommon.vm")
+<div class="span9">
+    <h3>缓存管理</h3>
+    <div class="info">
+		<button id="btn-confirm" class="btn dataSource-btn" style="margin-left: 10px; height: 40px;" onClick="enable()">开启</button>
+		<button id="btn-confirm" class="btn dataSource-btn" style="margin-left: 40px; height: 40px;" onClick="disable()">关闭</button>
+		<button id="btn-confirm" class="btn dataSource-btn" style="margin-left: 40px; height: 40px;" onClick="flush()">刷新</button>
+        <p></p>
+		<p><b>状态：</b>
+			#if($enable)
+				开启
+			#else
+				关闭
+			#end	
+		</p>
+		<p><b>URL：</b>$!url</p>
+		#if($enable)
+			<p><b> 详情：</b></p>	
+			<p>$detail</p>
+		#end		
+    </div>
+</div>
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script>
+        function enable() {
+            jQuery.ajax({
+                url: '/cache/enable',
+                type: 'POST',
+				dataType: 'json',
+                success: function (result) {
+					if(result.success) {
+				    	alert('开启缓存成功！');
+						location.reload(true);
+					}else{
+						alert('开启缓存失败:'+result.message);
+					}		
+                }
+            });
+        };
+		
+        function disable() {
+            jQuery.ajax({
+                url: '/cache/disable',
+                type: 'POST',
+				dataType: 'json',
+                success: function (result) {
+					if(result.success) {
+				    	alert('关闭缓存成功！');
+						location.reload(true);
+					}else{
+						alert('关闭缓存失败:'+result.message);
+					}		
+                }
+            });
+        };	
+		
+        function flush() {
+            jQuery.ajax({
+                url: '/cache/flush',
+                type: 'POST',
+				dataType: 'json',
+                success: function (result) {
+					if(result.success) {
+				    	alert('刷新缓存成功！');
+						location.reload(true);
+					}else{
+						alert('刷新缓存失败:'+result.message);
+					}		
+                }
+            });
+        };	
+</script>

@@ -1,0 +1,202 @@
+
+<div id="abc">
+    <span key="type" value="区域类型">区域类型:</span>
+    <select index="0" key="category">
+    </select>
+    <select index="1" key="value">
+    </select>
+    <select index="2">
+    </select>
+</div>
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script>
+
+    function getSelectParams(id,key, value){
+        var params={};
+        var firstKey = $('#'+id).find('span').attr('key'),
+            firstValue = $('#'+id).find('span').attr('value');
+        params[firstKey]="'"+firstValue+"'";
+        var currentDom;
+        if(key && value){
+            params[key]="'"+value+"'";
+            currentDom = $('#'+id).find('select[key="'+key+'"]');
+        }else{
+            currentDom = $('#'+id).find('span');
+        }
+        if(currentDom.prevAll('select').length>0){
+            currentDom.prevAll('select').each(function(){
+                var key = $(this).attr('key');
+                if(key && key !=''){
+                    params[key]="'"+$(this).val()+"'";
+                }
+            });
+        }
+        currentDom.nextAll().each(function(){
+            var key = $(this).attr('key');
+            if(key && key != ''){
+                params[key]='null';
+            }
+        });
+        return JSON.stringify(params);
+    }
+
+    function appendOption (id,key, value) {
+        var jsonStr = getSelectParams(id,key,value);
+        var index;
+        if(key){
+            index=$('#'+id+' select[key="'+key+'"]').attr('index');
+            index++;
+        }else{
+            index=0;
+        }
+        jQuery.ajax({
+            url:'/report/'+211+'/data',
+            type:'POST',
+            data:{jsonStr:jsonStr},
+            dataType:'json',
+            success:function(data){
+                var jsonStr = data.json,
+                    json = eval('('+ jsonStr +')');
+                    var datas = json[index].datas;
+                    var optionHtml='<option value="">请选择</option>';
+                    for(var j=0;j<datas.length;j++){
+                        optionHtml += '<option value="'+datas[j]+'">'+datas[j]+'</option>';
+                    }
+                    $('#'+id+' select[index="'+index+'"]').html(optionHtml);
+            }
+        });
+    }
+
+    appendOption('abc');
+
+    $('div').delegate('select', 'change', function(){
+        var value = $(this).val();
+        var key = $(this).attr('key');
+        if(key && value !=''){
+            appendOption('abc',key,value);
+        }
+    });
+
+</script>
+
+#*
+<div>
+    <span value="区域类型">区域类型:</span>
+    <select index="1" key="type">
+    </select>
+    <select index="2" key="category">
+    </select>
+    <select index="3" key="value">
+    </select>
+</div>
+
+<input type="hidden" index="0" key="type" value="区域类型" />
+<input type="hidden" index="1" key="category" value="地区"  />
+<input type="hidden" index="2" key="value" value="北京" />
+<input type="hidden" index="3" />
+
+
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+(function(){
+
+    function getSelectData(){
+        var json = {};
+        $('input').each(function(){
+            var key = $(this).attr('key'),
+                value = $(this).val();
+            if(value != ''){
+                json[key]= "'"+ value +"'";
+            }else{
+                json[key]="null";
+            }
+        });
+        var params = {
+            reportId:211,
+            paramsJson:JSON.stringify(json)
+        };
+        jQuery.ajax({
+            url:'/report/'+211+'data',
+            type:'POST',
+            data:params,
+            dataType:'json',
+            success:function(data){
+                var jsonStr = data.data,
+                        json = eval('('+ jsonStr +')');
+                for(var i=0;i<json.length;i++){
+                    var obj = json[i],
+                            datas = obj['datas'],
+                            optionHtml ='';
+                    var selectValue = $('input[index="'+ (i+1) +'"]').val();
+                    for(var j=0;j<datas.length;j++){
+                        if(selectValue != '' && selectValue == datas[j]){
+                            optionHtml += '<option selected>'+ datas[j] +'</option>';
+                        }else{
+                            optionHtml += '<option>'+ datas[j] +'</option>';
+                        }
+                    }
+                    $('select[index="'+ (i+1) +'"]').html(optionHtml);
+                }
+            }
+        });
+    }
+
+//    getSelectData();
+
+    /*
+    $('div').delegate('select', 'change', function(){
+        var value = $(this).val(),
+            index = $(this).attr('index');
+        $('input[index="'+ index +'"]').val(value);
+        index++;
+        for(var i=index;i<$('select').length;i++){
+            $('input[index="'+ i +'"]').val('');
+        }
+        getSelectData();
+    });*/
+
+    /**
+     *
+     */
+    var json ={
+        type:"'区域类型'",
+        category:'null',
+        value:'null'
+    };
+
+    var params = {
+        params:JSON.stringify(json)
+    };
+    jQuery.ajax({
+        url:'/report/'+211+'/data',
+        type:'POST',
+        data:params,
+        dataType:'json',
+        success:function(data){
+            var jsonStr = data['data'],
+                    json = eval('('+ jsonStr +')');
+            for(var i=0;i<json.length;i++){
+                var obj = json[i],
+                    datas = obj['datas'],
+                    optionHtml ='';
+                var selectValue = $('input[index="'+ i +'"]').val();
+                for(var j=0;j<datas.length;j++){
+//                    if(selectValue != '' && selectValue == datas[j]){
+//                        optionHtml += '<option selected>'+ datas[j] +'</option>';
+//                    }else{
+                        optionHtml += '<option parent="'+ selectValue +'">'+ datas[j] +'</option>';
+//                    }
+                }
+                $('select[index="'+ (i+1) +'"]').append(optionHtml);
+            }
+        }
+    });
+
+
+
+
+})();
+
+</script>
+    *#

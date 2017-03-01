@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/misc/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/misc/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/misc/css/site.css" rel="stylesheet">
+    <link href="/misc/css/common.css" rel="stylesheet">
+    <style type="text/css">
+        .span3{width:200px;}
+        .search{margin:20px 0 15px;}
+        .search input{margin:0 10px;}
+        .search select{margin:0 10px;}
+        td a{padding:0 5px;}
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand" href="#">
+                    Data Visualization System V1.3
+                </a>
+                <div class="nav-collapse">
+                    <ul class="nav pull-right">
+                        <li>
+                            <a href="javascript:void(0)" id="login">登录</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" id="logout">退出</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        $screen_content
+    </div>
+</div>
+<script type="text/javascript">
+var host = window.location.host;
+	$(function(){
+		jQuery.ajax({
+			url:"/user/name",
+			type: 'POST',
+	        dataType: 'json',
+	        success: function (data) {
+	        	console.log(data.name);
+	              if(data.name != null)	jQuery("#login").html(data.name);
+	              else jQuery("#login").html("登录");
+	         }
+		});
+		jQuery("#login").click(function(){
+			if(jQuery(this).html() == '登录')
+			 window.location.href = "http://dp.nong12.com/loginControl/login.do?returnurl=http://dvs.nong12.com/";
+		 });
+		
+		jQuery("#logout").click(function(){
+			deleteVisualCookie();
+		    window.location.href= "http://dp.nong12.com/loginControl/login.do?returnurl=http://"+host;
+		});
+		
+		 function deleteVisualCookie(){
+			  var current_host = host.substring(host.indexOf("."));
+		      document.cookie='SessionId=; path=/; domain=' + current_host;
+		    }
+	});
+</script>
+</body>
+</html>

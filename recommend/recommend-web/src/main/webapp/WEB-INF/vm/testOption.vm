@@ -1,0 +1,111 @@
+<script type="text/javascript" src="/misc/js/compress_base.js"></script>
+
+#set($layout="/layout/createLayout.vm")
+
+<div class="span9">
+    <h3>修改报表option</h3>
+    <div id="chart"></div>
+    <div>
+        <div style="margin:20px 0; float: left">
+            <button id="edit-report-option" class="btn option-btn">编辑OPTION</button>
+        </div>
+        <div id="random-btn" style="margin:20px 0">
+            <button id="random-report-option" class="btn option-btn">随机SQL数据展示</button>
+        </div>
+        <div id="input-js" style="margin:20px 0;">
+            <span>自定义Js</span>
+            <textarea rows="4" style="width:600px;" class="js_text"></textarea>
+            <button id="js_bn" class="btn js-btn">加载</button>
+        </div>
+        <div style="display:none;">
+            <button class="btn option-btn" onclick="Report.optionFormat()">格式化OPTION</button>
+            <button class="btn option-btn btn-primary" onclick="Report.optionCompress(this)">压缩OPTION</button>
+            <button id="report-refresh" class="btn option-btn" onclick="refresh();">刷新</button>
+            <textarea id="report-option-text" rows="14" style="width: 800px;margin-top:10px;">$!option</textarea>
+        </div>
+        <div class="step-btn">
+            <p>
+                <a href="javascript:void(0);" id="option-save" class="btn btn-primary btn-large">下一步/保存模板OPTION</a>
+            </p>
+        </div>
+    </div>
+</div>
+<input id="reportId" type="hidden" value="$!reportId" />
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script type="text/javascript" src="/misc/js/jsformat.js"></script>
+<script type="text/javascript" src="/misc/js/report.js"></script>
+<script type="text/javascript" src="/misc/js/dist/echarts.js"></script>
+<script type="text/javascript">
+    var chartType ='$!chartType';
+
+
+    function refresh(){
+        var jsonStr = $('#report-option-text').val();
+        var jsStr=$('#input-js textarea').val();
+        var params ={
+            json:jsonStr,
+            jsStr:jsStr
+        };
+        utils.fgetHtml('/report/refresh', 'chart', params);
+    }
+    refresh();
+
+
+
+(function(){
+
+    $('#random-btn').click(function(){
+        if('$!randomOption'==''){
+            alert("随机sql未导入，随机数据不存在")
+            return;
+        }
+        else{
+            var json='$!randomOption'
+
+            var params={
+
+                json:json
+            }
+            utils.fgetHtml('/report/refresh', 'chart', params);
+        }
+
+    })
+
+
+
+    // 编辑option
+    $('#edit-report-option').click(function(){
+        $('#report-option-text').closest('div').toggle('slow');
+    });
+
+    $('#option-save').click(function(){
+        var optionStr = $('#report-option-text').val(),
+                id = $('#reportId').val();
+        var params ={
+            id:id,
+            option:optionStr
+        };
+        jQuery.ajax({
+            url:'/report/saveOption',
+            type:'POST',
+            data:params,
+            dataType:'json',
+            success:function(data){
+                if(data['success']){
+                    alert('保存模板option成功！即将进入模板浏览页面。');
+                    window.location.href = '/data/view/'+id;
+                }else{
+                    alert('保存模板option失败！');
+                }
+            },
+            error:function(){
+                alert('保存模板option出错！');
+            }
+        });
+    });
+
+})();
+
+</script>

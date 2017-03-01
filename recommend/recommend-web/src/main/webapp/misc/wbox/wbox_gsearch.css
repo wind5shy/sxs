@@ -1,0 +1,154 @@
+#wBox .wBox_tb
+{
+    background-image: url(b/tb.png);
+    height:5px;
+	background-repeat:repeat-x
+}
+#wBox .wBox_rb
+{
+    background-image: url(b/rb.png);
+    width: 5px;
+	background-repeat:repeat-y
+}
+#wBox .wBox_lb
+{
+    background-image: url(b/lb.png);
+    width: 5px;
+	background-repeat:repeat-y
+}
+#wBox .wBox_bb
+{
+    background-image: url(b/bb.png);
+    height: 5px;
+	background-repeat:repeat-x
+}
+#wBox
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    text-align: left;
+    display: none;
+}
+
+#wBox .wBox_popup
+{
+    position: relative;
+}
+
+#wBox table
+{
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+#wBox td
+{
+    border-bottom: 0;
+    padding: 0;
+}
+
+#wBox .wBox_body
+{
+    background-color: #ffffff;
+    border: 1px solid #000;
+}
+
+#wBox img
+{
+    border: 0;
+    margin: 0;
+}
+#wBox .wBox_title
+{
+    height: 26px;
+    color: #fff;
+    width: 100%;
+    background: url(titleBG_search.png) repeat-x;
+}
+#wBox .wBox_title .wBox_itemTitle
+{
+    padding-left: 5px;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: Calibri;
+}
+#wBox .wBox_title .wBox_close
+{
+    background: url(close.png) no-repeat 0 0;
+    height: 14px;
+    width: 14px;
+    overflow: hidden;
+    cursor: pointer;
+}
+#wBox .wBox_title .on
+{
+    background-position: 0 -14px;
+}
+#wBox .wBox_tl
+{
+    height: 5px;
+    width: 5px;
+    overflow: hidden;
+    background-image: url(b/tl.png);
+    padding: 0;
+}
+#wBox .wBox_tr
+{
+    height: 5px;
+    width: 5px;
+    overflow: hidden;
+    background-image: url(b/tr.png);
+    padding: 0;
+}
+#wBox .wBox_bl
+{
+    height: 5px;
+    width: 5px;
+    overflow: hidden;
+    background-image: url(b/bl.png);
+    padding: 0;
+}
+#wBox .wBox_br
+{
+    height: 5px;
+    width: 5px;
+    overflow: hidden;
+    background-image: url(b/br.png);
+    padding: 0;
+}
+
+#wBox #wBoxContent
+{
+    padding: 3px;
+}
+#wBox_overlay
+{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+}
+#wBox .wBox_load
+{
+    width: 270px;
+}
+.wBox_hide
+{
+    z-index: -100;
+}
+
+.wBox_overlayBG
+{
+    background-color: #FFF;
+    z-index: 99;
+}
+#wBox #wBox_loading
+{
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+}

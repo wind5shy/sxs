@@ -1,0 +1,85 @@
+
+<table id="wctable" class="table table-bordered table-striped">
+    <thead>
+    <th style="width:230px;">
+        <p class="title">X轴</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">Y1轴</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">Y2轴</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th>
+        <p class="title">名称</p>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="container1">
+            <ul class="drop-target" type="X1"></ul>
+        </td>
+        <td class="container2">
+            <ul class="drop-target" type="Y1"></ul>
+        </td>
+        <td class="container3">
+            <ul class="drop-target" type="Y2"></ul>
+        </td>
+        <td>
+            <ul id="drop-name"></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div style="text-align:right;margin-bottom:10px;">
+    <a href="javascript:void(0);" id="add-y2" class="toggle-link">
+        <i class="icon-plus"></i>增加一组配置
+    </a>
+    <a href="javascript:void(0);" id="remove-y2" style="display:none;" class="toggle-link data-a-remove">
+        <i class="icon-plus"></i>删除增加的配置
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    function validateDefXY(){
+        var tds = $('.drag tbody td');
+        var xliType = tds.eq(0).find('li:first').attr('type');
+        var yliType = tds.eq(1).find('li:first').attr('type');
+        if(xliType=='STRING' && yliType=='STRING'){
+            return '拖入的字段只能有一个是String类型！';
+        }
+    }
+
+    $('#add-y2').click(function(){
+        $(this).hide();
+        $('#remove-y2').show();
+        if($('#y2-table').length> 0){
+            return;
+        }
+        var y2tableHtml = '<table id="y2-table" class="table table-bordered table-striped"><thead>' +
+                '<th style="width:230px;"><p class="title">X轴</p><p class="message">拖拽属性到这里(只能拖入类型相同的)</p></th>'+
+                '<th style="width:230px;"><p class="title">Y2轴</p><p class="message">拖拽属性到这里(只能拖入类型相同的)</p></th>'+
+                '<th><p class="title">名称</p></th></thead>'+
+                '<tbody><tr>'+
+                '<td class="container3"><ul class="drop-target" type="X1"></ul></td>'+
+                '<td class="container4"><ul class="drop-target" type="Y2"></ul></td>'+
+                '<td><ul id="drop-name-y2"></ul></td></tr></tbody></table>';
+        $('#typeConf').append(y2tableHtml);
+        var target =['.container3', '.container4'];
+        Report.dragEvent(target, 'drop-name-y2');
+    });
+
+    $('#remove-y2').click(function(){
+        $(this).hide();
+        $('#add-y2').show();
+        $('#y2-table').remove();
+    });
+
+    var target = ['.container1','.container2','.container3'];
+    Report.dragEvent(target);
+</script>

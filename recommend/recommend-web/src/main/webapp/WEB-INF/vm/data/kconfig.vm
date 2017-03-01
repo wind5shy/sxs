@@ -1,0 +1,71 @@
+<style type="text/css">
+    .drop-target li{width: 160px;}
+    #drop-name input{width: 70px;}
+    .target table{margin-left:-100px;}
+</style>
+
+<table id="wctable" class="table table-bordered table-striped">
+    <thead>
+    <th style="width:230px;">
+        <p class="title">X轴</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">开盘</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">收盘</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">最高</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">最低</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th>
+        <p class="title">名称</p>
+    </th>
+    </thead>
+
+    <tbody>
+    <tr>
+        <td class="container1" style="padding:0">
+            <ul class="drop-target" style="padding:0"></ul>
+        </td>
+        <td class="container2 " style="padding:0">
+            <ul class="drop-target" style="padding:0"></ul>
+        </td>
+        <td class="container3 " style="padding:0">
+            <ul class="drop-target" style="padding:0"></ul>
+        </td>
+        <td class="container4 " style="padding:0">
+            <ul class="drop-target" style="padding:0"></ul>
+        </td>
+        <td class="container5" style="padding:0">
+            <ul class="drop-target" style="padding:0"></ul>
+        </td>
+        <td>
+            <ul id="drop-name"></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    function validateDefK () {
+        var msg;
+        var tds = $('.drag tbody td');
+        for(var i=1;i<tds.length-1;i++){
+            if(tds.eq(i).find('li:first').attr('type') != 'NUMBER'){
+                return '其他轴只能拖入数字类型字段！';
+            }
+        }
+    }
+
+    var target = ['.container1','.container2','.container3','.container4','.container5'];
+    Report.dragEvent(target);
+</script>

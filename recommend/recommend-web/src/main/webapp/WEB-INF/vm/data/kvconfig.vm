@@ -1,0 +1,44 @@
+<table id="wctable" class="table table-bordered table-striped">
+    <thead>
+    <th style="width:230px;">
+        <p class="title">NAME轴</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">VALUE轴</p>
+        <p class="message">拖拽属性到这里(只能拖入类型相同的)</p>
+    </th>
+    <th>
+        <p class="title">名称</p>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="container1">
+            <ul class="drop-target" type="NAME"></ul>
+        </td>
+        <td class="container2">
+            <ul class="drop-target" type="VALUE"></ul>
+        </td>
+        <td>
+            <ul id="drop-name"></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    function validateDefKV(){
+        var groupsLength = $('.drag tbody td:first').find('li').length;
+        if(groupsLength > 3){
+            return '该类型最多只能拖入3组配置！';
+        }
+        var dataType = $('.drag tbody td:first').find('li:first').attr('type');
+        if(dataType != 'STRING'){
+            return 'NAME轴只能拖入字符串类型！';
+        }
+    }
+
+    var target = ['.container1','.container2'];
+    Report.dragEvent(target);
+</script>

@@ -1,0 +1,45 @@
+#if($!errorMsg)
+    <div class="errorMsg" style="margin:40px;">
+        <b>$!errorMsg</b>
+        <b>$!error</b>
+    </div>
+#else
+    #if($sigleRedis)
+        #foreach($!sigle in $sigleRedis)
+        <div style="padding:30px 0 10px;">
+            <span>redis单记录模板值</span>
+            <textarea>$!sigle</textarea>
+        </div>
+        #end
+
+    #else
+        #if($!data.size()>0)
+            #foreach($table in $!data)
+            <div style="padding:30px 0 10px;">
+                <span>$!table.sql</span>
+            </div>
+            <div class="query-data">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        #foreach($th in $!table.metas)
+                            <th>$!th.get("name")</th>
+                        #end
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($item in $!table.datas)
+                        <tr>
+                            #foreach($td in $item)
+                                <td>$!td</td>
+                            #end
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            </div>
+            #end
+        #end
+    #end
+
+#end

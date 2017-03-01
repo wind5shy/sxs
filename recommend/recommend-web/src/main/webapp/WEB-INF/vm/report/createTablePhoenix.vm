@@ -1,0 +1,188 @@
+#set($layout="/layout/createLayout.vm")
+
+<div class="span9">
+    <div id="sql-step" class="step1">
+        <h3>新增模板(数据类型)</h3>
+        <div>
+            <span>模板名称：</span>
+            <input id="name" type="text" maxlength="50" style="margin-left:35px;width:350px;" />
+        </div>
+        <div>
+            <span>模板描述：</span>
+            <textarea id="description" maxlength="100" style="margin-left:35px;width:350px;"></textarea>
+        </div>
+        <div>
+            <span>请选择宽表类型</span>
+            <select id="table" type="text" maxlength="50" style="width:100px; height: 30px;margin-left: 5px;" >
+                <option value="bigTable_order">订单宽表</option>
+                <option value="bigTable_product">商品宽表</option>
+                <option value="bigTable_user">用户宽表</option>
+            </select>
+        </div>
+        <div id="select-sql">
+            <span>SELECT SQL：</span>
+            <textarea rows="4" style="width:600px;"></textarea>
+        </div>
+        <div id="where-sql">
+            <span>WHERE SQL：</span>
+            <textarea rows="4" style="width:600px;"></textarea>
+        </div>
+    </div>
+    <div style="margin-top:40px;">
+        <button id="sql-query" class="btn" style="width: 130px;">获取phoenix数据</button>
+    </div>
+    <div id="data-conf"></div>
+    <div style="margin-top: 40px;display:none;">
+        <p>
+            <a class="btn btn-primary btn-large" id="report-btn" href="javascript:void(0);">保存报表模板</a>
+        </p>
+    </div>
+</div>
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script>
+    (function(){
+//        $('#report-create-pic').addClass('active');
+        $('#report-create-data').addClass('active');
+
+
+        // sql导入和保存模板
+        function validate () {
+            if($('#select-sql textarea').val().trim() == ''){
+                alert('请输入select条件！');
+                return false;
+            }
+            if($('#where-sql textarea').val().trim() == ''){
+                alert('请输入where条件！');
+                return false;
+            }
+            if($('#name').val().trim()==''){
+                alert('请输入模板名称！');
+                return false;
+            }
+            if($('#description').val().trim()==''){
+                alert('请输入模板描述！');
+                return false;
+            }
+
+            return true;
+        }
+        function getParams () {
+            var sqlText = $('.search textarea'),
+                sql = '';
+            for(var i=0;i<sqlText.length;i++){
+                var sqlTemp = sqlText.eq(i).val();
+                if(i < sqlText.length-1){
+                    sql += sqlTemp +';';
+                }else{
+                    sql += sqlTemp;
+                }
+            }
+
+            var trs = $('#params-table tbody tr'),
+                json = {};
+            for(var i=0;i<trs.length;i++){
+                var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                    value = trs.eq(i).find('input[name="value"]').val(),
+                    selectType = trs.eq(i).find('select').val();
+                if(selectType == 1){
+                    value = Number(value);
+                }
+                json[name]=value;
+            }
+
+            var jsonStr = JSON.stringify(utils.fgetParamsArray(json));
+
+            var name = $('#name').val().trim(),
+                description = $('#description').val();
+            var params = {
+                name:name,
+                description:description,
+                opExpr:sql,
+                type:3,
+                paramsJson:jsonStr,
+                params:jsonStr,
+                sourceType:1
+            };
+            //    兼容redis模式，所有sql数据模板和redis的非单记录模板，sigleRedis都为1,单记录模板sigleRedis为2
+
+            params.singleRedis=1;
+
+            return params;
+        }
+
+        // 导入SQL
+        $('#sql-query').click(function(){
+            if(!validate()){
+                return;
+            }
+            var table=$('#table option:selected').val();
+            var selectSql=$('#select-sql textarea').val().trim();
+            var whereSql=$('#where-sql textarea').val().trim();
+            jQuery.ajax({
+                url:'/report/getPhoenixData',
+                type:'POST',
+                data:{
+                    table:table,
+                    selectSql:selectSql,
+                    whereSql:whereSql,
+                },
+                success:function(data){
+                    $('#data-conf').html(data);
+                    if($('.errorMsg').length == 0){
+                        $('#report-btn').closest('div').show();
+                    }else{
+                        $('#report-btn').closest('div').hide();
+                    }
+                },
+                error:function(){
+                    $('#data-conf').html("");
+                    alert('导入phoenix数据失败！');
+                }
+            });
+
+        });
+
+        // 保存模板
+        $('#report-btn').click(function() {
+            if(!validate()){
+                return;
+            }
+            var table=$('#table option:selected').val();
+            var selectSql=$('#select-sql textarea').val().trim();
+            var whereSql=$('#where-sql textarea').val().trim();
+            var name = $('#name').val().trim(),
+                    description = $('#description').val();
+            var params = {
+                name:name,
+                description:description,
+//                table
+                opExpr:table,
+                type:3,
+//                selectSql
+                jsCode:selectSql,
+//                whereSql
+                jsTransform:whereSql,
+
+                sourceType:2
+            };
+
+            jQuery.ajax({
+                url:'/report/doSavePhoenixReport',
+                type:'POST',
+                data:params,
+                dataType:'json',
+                success:function(data){
+                    if(data.success){
+                        alert('保存数据类型模板成功！将前往模板列表。');
+                        window.location.href = '/datas';
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+    })();
+</script>

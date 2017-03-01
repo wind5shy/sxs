@@ -1,0 +1,60 @@
+<style type="text/css">
+    #view{display:none;}
+    #chart-show{border:1px solid #d4d4d4;border-radius:4px;-webkit-border-radius：4px;height:400px;padding:20px;}
+</style>
+
+<div>
+    <div id="chart-show">
+    </div>
+    <span id="view">$!option</span>
+</div>
+
+
+<script type="text/javascript" src="/misc/js/dist/echarts.js"></script>
+<script type="text/javascript">
+    var myChart = {};
+    require.config({
+        paths : {
+            echarts : 'http://echarts.baidu.com/build/dist'
+        }
+    });
+    // echarts主题
+    var currentTheme={};
+    require(['/misc/js/dist/theme/macarons'], function(theme){
+        currentTheme = theme;
+    });
+
+    var jsonStr = document.getElementById('view').innerHTML;
+    var chartType ='$!chartType';
+    if(jsonStr != ''){
+        // 为echarts对象加载数据
+        var option = eval('(' + jsonStr + ')');
+        require(['echarts', 'echarts/chart/'+chartType, getEchartModel(chartType) // 使用柱状图就加载bar模块，按需加载
+                ],
+                function(ec) {
+                    // 基于准备好的dom，初始化echarts图表
+                    myChart = ec.init(document.getElementById('chart-show'));
+                    myChart.setOption(option);
+                    myChart.setTheme(currentTheme);
+                });
+    }else{
+        document.getElementById('chart-show').innerHTML = '预览失败！';
+    }
+
+    function getEchartModel(type){
+        var model='echarts/chart/';
+        if(type =='line'){
+            model += 'bar';
+        }else if(type=='bar'){
+            model+='line';
+        }else if(type=='pie'){
+            model+='funnel';
+        }else if(type=='funnel'){
+            model+='pie';
+        }else{
+            model+='line';
+        }
+        return model;
+    }
+
+</script>

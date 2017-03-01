@@ -1,0 +1,62 @@
+#set($layout="/layout/indexLayout.vm")
+
+#parse("common/navcommon.vm")
+<div class="span9">
+    <h3>模板列表(数据类型)</h3>
+    <div class="search">
+        <span>名称：</span>
+        <input id="name" type="text" />
+##        <select>
+##            <option value="">请选择-默认</option>
+##            <option value="desc">按更新时间倒序</option>
+##            <option value="asc">按更新时间升序</option>
+##        </select>
+        <span>ID：</span>
+        <input id="id" style="width:60px;" type="text" />
+##        <button class="btn" style="width: 80px;">搜索</button>
+    </div>
+    <div id="report-list"></div>
+</div>
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script type="text/javascript" src="/misc/js/common.js"></script>
+<script type="text/javascript">
+    $('#report-list-data').addClass('active');
+
+    function queryList(page){
+        var url = '/report/list',
+                id=$('#id').val().trim(),
+                name = $('#name').val().trim();
+        var params = {
+            page:page,
+            type:3
+        };
+        if(name != ''){
+            params.name = name;
+        }
+        if(id!=''){
+            params.id=id;
+        }
+        var selectType = $('.search select').val();
+        if(selectType != ''){
+            params.orderFieldType=selectType;
+            params.orderField='modifyDate';
+        }
+
+        utils.fgetHtml(url, 'report-list', params);
+    }
+
+    queryList(1);
+
+//    $('.search button').click(function(){
+//        queryList(1);
+//    });
+
+    $('.search #name').change(function(){
+        queryList(1)
+    })
+    $('.search #id').change(function(){
+        queryList(1)
+    })
+</script>

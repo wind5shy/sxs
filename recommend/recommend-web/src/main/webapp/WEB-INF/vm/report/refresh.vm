@@ -1,0 +1,88 @@
+<style type="text/css">
+    #view{display:none;}
+    #chart-show{border:1px solid #d4d4d4;border-radius:4px;-webkit-border-radius：4px;height:400px;padding:20px;}
+</style>
+
+<div id="chart-show">
+</div>
+<span id="view">$!option</span>
+<textarea id="jsTransform" style="display: none">$!jsTransform</textarea>
+
+
+<script type="text/javascript">
+
+    require.config({
+        paths : {
+            echarts : '/misc/js/dist'
+        }
+    });
+    // echarts主题
+    var currentTheme={};
+    require(['echarts/theme/macarons'], function(theme){
+        currentTheme = theme;
+    });
+    //加载初始的日期处理函数，不用再transformjs中写
+    Date.prototype.FormatJS = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+    var jsonStr = document.getElementById('view').innerHTML;
+     var      myChart;
+    var chartType ='$!charType';
+    if(jsonStr != ''){
+        // 为echarts对象加载数据
+        var option = eval('(' + jsonStr + ')');
+        var jsTransform=$('#jsTransform').val();
+        if(jsTransform!=''){
+            eval(jsTransform);
+            console.log(option);
+        }
+        require(['echarts', 'echarts/chart/'+chartType,getEchartModel(chartType) // 使用柱状图就加载bar模块，按需加载
+                ],
+                function(ec) {
+                    // 基于准备好的dom，初始化echarts图表
+                     myChart = ec.init(document.getElementById('chart-show'));
+                    myChart.setOption(option);
+                    myChart.setTheme(currentTheme);
+                });
+    }else{
+        document.getElementById('chart-show').innerHTML = '预览失败！';
+    }
+
+    function getEchartModel(type){
+        var model='echarts/chart/';
+        if(type =='line'){
+            model += 'bar';
+        }else if(type=='bar'){
+            model+='line';
+        }else if(type=='pie'){
+            model+='funnel';
+        }else if(type=='funnel'){
+            model+='pie';
+        }else{
+            model+='line';
+        }
+        return model;
+    }
+
+    $!jsStr
+
+
+
+
+
+
+</script>
+

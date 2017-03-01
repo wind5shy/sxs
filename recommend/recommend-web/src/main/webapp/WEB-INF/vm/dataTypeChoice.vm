@@ -1,0 +1,231 @@
+#set($layout="/layout/createLayout.vm")
+<script type="text/javascript" src="/misc/js/compress_base.js"></script>
+
+<div class="span9">
+    #parse("common/chartCreateNav.vm")
+
+    <div class="report-step">
+        <span id="dataTemplate" style="display: none">$!dataTemplate</span>
+        <h3>数据源配置</h3>
+        <div>
+            <span>数据源选择：</span>
+            <select id="name" type="text" maxlength="50" style="width:300px; height: 30px;" >
+              <option value="redis">redis数据源</option>
+               <option value="sql">sql数据源</option>
+               #if($dataTemplate)
+                   <option value="phoenix">phoenix数据源</option>
+               #end
+
+             </select>
+            <button id="btn-confirm" class="btn dataSource-btn" style="margin-left: 10px; height: 40px;">确定</button>
+        </div>
+    </div>
+
+
+
+
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/jquery/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script type="text/javascript" src="/misc/js/common.js"></script>
+<script type="text/javascript" src="/misc/js/jsformat.js"></script>
+<script type="text/javascript" src="/misc/js/report.js"></script>
+<script>
+(function(){
+    if($('#dataTemplate').html()==''){
+        $('#report-create-pic').addClass('active');
+    }
+    else{
+        $('#report-create-data').addClass('active');
+    }
+
+
+    $('#btn-confirm').click(function(){
+    	jQuery.ajax({
+    		url:"/user/name",
+			type: 'POST',
+	        dataType: 'json',
+	        success: function (data) {
+	        	if(data.name == null ) {
+	        		alert("请登录后再来");
+	        		window.location.href = "http://dp.nong12.com/loginControl/login.do?returnurl=http://dvs.nong12.com/";
+	        	}
+	        	else{
+	        		var  dataSource=$('#name option:selected').val();
+	                if($('#dataTemplate').html()=='') location.href = "/dataSource?dataSource="+dataSource
+	                else
+	                    location.href = "/dataSourceTemplate?dataSource="+dataSource;
+	        	 }
+	        }
+    	});
+    	
+        
+
+
+    });
+
+    $('.span9').delegate('.params-remove', 'click', function (){
+        $(this).closest('tr').remove();
+    });
+
+    $('#add-sql').click(function() {
+        if ($('.search').length === 10) {
+            alert('最多只能有10个SQL输入框！');
+            return;
+        }
+        var html = '<div class="search"><a class="toggle-link sql-text-remove data-a-remove " href="javascript:void(0);"><i class="icon-plus"></i>删除</a><div class="sql"><span>SQL:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <textarea rows="4" style="width:600px;" class="sql_text"></textarea></div>' +
+                '<div class="random-sql"> <span>随机SQL：</span> <textarea rows="4" style="width:600px;" class="sql_text"></textarea></div></div>';
+        $('#sql-step').append(html);
+
+    })
+
+//    $('.sql-text-remove').click(function(){
+//     $(this).closest('div').remove();
+//    })
+    $('.span9').delegate('.sql-text-remove', 'click', function (){
+        $(this).parents('.search').remove();
+    });
+
+    function validate () {
+        if($('#name').val().trim() == ''){
+            alert('请输入模板名称！');
+            return false;
+        }
+        for(var i=0;i<$('.sql textarea').length;i++){
+            if($('.sql textarea').eq(i).val()==''){
+                alert('第'+i+"个sql输入为空!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function getParams() {
+        var sqlText = $('.sql textarea'),
+                sql = '';
+        for(var i=0;i<sqlText.length;i++){
+            var sqlTemp = sqlText.eq(i).val();
+            if(i < sqlText.length-1){
+                sql += sqlTemp +';';
+            }else{
+                sql += sqlTemp;
+            }
+        }
+        var randomSqlText=$('.random-sql textarea'),randomSql='';
+        for(var i=0;i<randomSqlText.length;i++){
+            var temp=randomSqlText.eq(i).val();
+            if(temp!=""){
+                if(i<randomSqlText.length-1){
+                    randomSql+=temp+';';
+                }
+                else{
+                    randomSql+=temp;
+                }
+            }
+
+        }
+
+
+
+        var sorters = Report.getLimitInputParams('sort-params');
+      var   paramsJson = JSON.stringify(utils.fgetParamsArray(getSqlParams(), sorters));
+        var params ={
+            sql:sql,
+            paramsJson:paramsJson,
+            randomSql:randomSql
+        };
+        console.log(params)
+        return params;
+    }
+
+    $('#sql-query').click(function(){
+        if(!validate()){
+            return;
+        }
+        if(!Report.inputValidate('sql-params') || !Report.inputValidate('sort-params')){
+            return;
+        }
+        var params = getParams();
+
+
+//        var sorters = Report.getLimitInputParams('sort-params');
+//        var sql = $('#sql').val(),
+//            paramsJson = JSON.stringify(utils.fgetParamsArray(getSqlParams(), sorters));
+//        var params ={
+//            sql:sql,
+//            paramsJson:paramsJson
+//        };
+        jQuery.ajax({
+            url:'/data/query',
+            type:'POST',
+            data:params,
+            success:function(data){
+                $('#report-step-2').html(data);
+                DL.navChange(1);
+            },
+            error:function(){
+                alert('导入SQL失败！');
+            }
+        });
+    });
+
+    // 编辑option
+    $('#edit-report-option').click(function(){
+        $('#report-option-text').closest('div').toggle('slow');
+    });
+
+    $('#report-refresh').click(function(){
+        var jsonStr = $('#report-option-text').val();
+        var params ={
+            json:jsonStr
+        };
+        utils.fgetHtml('/report/refresh', 'report-preview', params);
+    });
+
+    $('#option-save').click(function(){
+        var optionStr = $('#report-option-text').val(),
+            id = $('#reportId').val();
+        var params ={
+            id:id,
+            option:optionStr
+        };
+        jQuery.ajax({
+            url:'/report/saveOption',
+            type:'POST',
+            data:params,
+            dataType:'json',
+            success:function(data){
+                if(data['success']){
+                    alert('保存模板option成功！即将进入模板浏览页面。');
+                    window.location.href = '/data/view/'+id;
+                }else{
+                    alert('保存模板option失败！');
+                }
+            },
+            error:function(){
+                alert('保存模板option出错！');
+            }
+        });
+    });
+
+
+
+})();
+
+function getSqlParams () {
+    var trs = $('#sql-params tbody tr'),
+            json = {};
+    for(var i=0;i<trs.length;i++){
+        var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                value = trs.eq(i).find('input[name="value"]').val(),
+                selectType = trs.eq(i).find('select').val();
+        if(selectType == 1){
+            //数字型需要转换下
+            value = Number(value);
+        }
+        json[name]=value;
+    }
+    return json;
+}
+</script>

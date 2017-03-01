@@ -1,0 +1,69 @@
+#macro(showPage $page $methodName)
+<ul>
+    #if ($!page.currentPage > 1)
+        <li>
+            <a href="javascript:void(0);" onclick="$methodName($!page.currentPage - 1)">«</a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="$methodName(1)">1</a>
+        </li>
+    #else
+        <li class="disabled">
+            <a href="javascript:void(0);">«</a>
+        </li>
+    #end
+
+    #showPagePos($page, $methodName)
+
+    #if ($!page.currentPage < $!page.pageCount)
+        <li>
+            <a href="javascript:void(0);" onclick="$methodName($!page.pageCount)">$!page.pageCount</a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="$methodName($!page.currentPage + 1)">»</a>
+        </li>
+    #else
+        <li class="disabled">
+            <a href="javascript:void(0);">»</a>
+        </li>
+    #end
+</ul>
+#end
+
+## 显示分页尾巴
+#macro(showPagePos $page $methodName)
+    #set($pagePos = 4)
+
+    #if($!page.currentPage > $pagePos + 2)
+        <li class="disabled">
+            <a href="javascript:void(0);">...</a>
+        </li>
+    #end ##显示前面的省略号
+    #foreach($i in [$pagePos..1]) ##增加前面的尾巴
+        #if($!page.currentPage - $i > 1)
+        #set($pageIndex= $!page.currentPage - $i)
+            <li>
+                <a href="javascript:void(0);" onclick="$!methodName($pageIndex)">$pageIndex</a>
+            </li>
+        #end
+    #end
+
+    <li class="active">
+        <a href="javascript:void(0);">$!page.currentPage</a> ##显示当前页号
+    </li>
+
+    #foreach($i in [1..$pagePos]) ##增加后面的尾巴
+        #if($!page.pageCount - $!page.currentPage - $i > 0)
+        #set($pageIndex= $!page.currentPage + $!i)
+            <li>
+                <a href="javascript:void(0);" onclick="$!methodName($pageIndex)">$pageIndex</a>
+            </li>
+        #end
+    #end
+    #if($!page.pageCount - $!page.currentPage > $pagePos)
+        <li class="disabled">
+            <a href="javascript:void(0);">...</a>
+        </li>
+    #end ##显示后面的省略号
+#end
+

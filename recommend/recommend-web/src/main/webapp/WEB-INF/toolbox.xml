@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolbox>
+    <tool>
+        <key>dateformat</key>
+        <class>org.apache.commons.lang.time.DateFormatUtils</class>
+    </tool>
+    <tool>
+        <key>vmUtils</key>
+        <class>com.shixiseng.recommend.interface.common.web.VmUtils</class>
+    </tool>
+</toolbox>

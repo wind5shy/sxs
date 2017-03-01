@@ -1,0 +1,85 @@
+<div style="float: left;margin-right: 240px;">
+<table id="categoryTable" class="table table-bordered table-striped multy-table" style="width: 230px;">
+    <thead>
+    <th style="width:230px;">
+        <p class="title">category名</p>
+        <p class="message">拖拽category索引列到这里(只能拖入类型相同的)</p>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="container1">
+            <ul class="drop-target" type="NODE_CATE" ></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+<div>
+<table id="nodeTable" class="table table-bordered table-striped multy-table" style="width: 230px;">
+    <thead>
+    <th style="width:230px;">
+        <p class="title">node名</p>
+        <p class="message">拖拽node索引列到这里(只能拖入类型相同的)</p>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="container2">
+            <ul class="drop-target" type="NODE_NAME"></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+<div>
+<table id=“linkTable" class="table table-bordered table-striped  multy-table">
+    <thead>
+    <th style="width:230px;">
+        <p class="title">source名</p>
+        <p class="message">拖拽source列到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">target名</p>
+        <p class="message">拖拽target列到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">weight</p>
+        <p class="message">拖拽weight列到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">weight2</p>
+        <p class="message">拖拽weight2列到这里(只能拖入类型相同的)</p>
+    </th>
+    <th style="width:230px;">
+        <p class="title">linkName</p>
+        <p class="message">拖拽linkName列到这里(只能拖入类型相同的)</p>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="container3">
+            <ul class="drop-target" type="LINK_SOURCE"></ul>
+        </td>
+        <td class="container4">
+            <ul class="drop-target" type="LINK_TARGET"></ul>
+        </td>
+        <td class="container5">
+            <ul class="drop-target" type="LINK_WEIGHT"></ul>
+        </td>
+        <td class="container6">
+            <ul class="drop-target" type="LINK_WEIGHT2"></ul>
+        </td>
+        <td class="container7">
+            <ul class="drop-target" type="LINK_NAME"></ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+
+
+<script type="text/javascript">
+    var target = ['.container1','.container2','.container3','.container4','.container5','.container6','.container7'];
+    Report.dragMutiTableEvent(target);
+</script>

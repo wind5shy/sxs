@@ -1,0 +1,240 @@
+#set($layout="/layout/createLayout.vm")
+
+<div class="span9">
+    <div id="sql-step" class="step1">
+        <h3>修改模板(数据类型)</h3>
+        <div>
+            <span>模板名称：</span>
+            <input id="name" type="text" maxlength="50" style="width:350px;" value="$!report.name" />
+        </div>
+        <div>
+            <span>模板描述：</span>
+            <textarea id="description" maxlength="100" style="width:350px;">$!report.description</textarea>
+        </div>
+        #foreach($sql in $!sqls)
+            <div class="search">
+                <span>SQL：</span>
+                <textarea rows="4" style="width:600px;">$!sql</textarea>
+                #if($!velocityCount == 1)
+                    <a class="toggle-link" id="add-sql" href="javascript:void(0);"><i class="icon-plus"></i>增加一个SQL</a>
+                #else
+                    <a class="toggle-link sql-text-remove data-a-remove" href="javascript:void(0);"><i class="icon-plus"></i>删除</a>
+                #end
+            </div>
+        #end
+    </div>
+    <div style="padding:10px;">
+        <a href="javascript:void(0);" id="add-param" class="toggle-link"><i class="icon-plus"></i>增加一个参数配置</a>
+    </div>
+    <div id="params-table">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>参数名称</th>
+                <th>参数类型</th>
+                <th>参数值</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            #foreach($key in $!params.keySet())
+                <tr>
+                    <td>
+                        <input name="name" type="text" value="$!key" />
+                    </td>
+                    <td>
+                        <select style="width:100px;">
+                            <option value="0" #if($!vmUtils.objectType($!params.get($!key)) == 0&&!$!vmUtils.isSqlParam($!params.get($!key))) selected #end>
+                                字符型
+                            </option>
+                            <option value="1" #if($!vmUtils.objectType($!params.get($!key)) == 1) selected #end>
+                                数字型
+                            </option>
+                            <option value="2" #if($!vmUtils.isSqlParam($!params.get($!key))) selected #end>
+                                sql语句类型
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="value" value="$!vmUtils.fiterSqlFlag($!params.get($!key))"/>
+                    </td>
+                    <td>
+                        <a href="javascript:void(0);" class="toggle-link params-remove data-a-remove"><i class="icon-plus"></i>删除</a>
+                    </td>
+                </tr>
+            #end
+            </tbody>
+        </table>
+    </div>
+    <div style="margin-top:40px;">
+        <button id="sql-query" class="btn" style="width: 130px;">导入所有SQL</button>
+    </div>
+    <div id="data-conf"></div>
+	#if($!report.state == 2)
+    <div style="margin-top: 40px;display:none;">
+        <p>
+            <a class="btn btn-primary btn-large" id="report-btn" href="javascript:void(0);">保存报表模板</a>
+        </p>
+    </div>
+	#end
+</div>
+<input type="hidden" value="$!report.id" id="reportId" />
+
+<script type="text/javascript" src="/misc/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/misc/js/utils.js"></script>
+<script>
+    (function(){
+
+        $('#add-sql').click(function(){
+            if($('.search').length === 10){
+                alert('最多只能有10个SQL输入框！');
+                return;
+            }
+            var html = '<div class="search"><span>SQL：</span> <textarea rows="4" style="width:600px;"></textarea>' +
+                    ' <a class="toggle-link sql-text-remove data-a-remove" href="javascript:void(0);"><i class="icon-plus"></i>删除</a></div>';
+            $('#sql-step').append(html);
+        });
+
+        $('.span9').delegate('.sql-text-remove', 'click', function (){
+            $(this).closest('div').remove();
+        });
+
+        $('#add-param').click(function(){
+            var html = '<tr><td><input name="name" type="text" /></td>' +
+                    '<td><select style="width:100px;"><option value="0">字符型</option><option value="1">数字型</option></select></td>' +
+                    '<td><input name="value" type="text" /></td>' +
+                    '<td><a href="javascript:void(0);" class="toggle-link params-remove data-a-remove"><i class="icon-plus"></i>删除</a></td></tr>';
+            $('#params-table table tbody').append(html);
+        });
+
+        $('.span9').delegate('.params-remove', 'click', function (){
+            $(this).closest('tr').remove();
+        });
+
+        // sql导入和保存模板
+        function validate () {
+            if($('#name').val().trim() == ''){
+                alert('请输入模板名称！');
+                return false;
+            }
+
+            var sqlText = $('.search textarea');
+            for(var i=0;i<sqlText.length;i++){
+                var sqlTemp = sqlText.eq(i).val();
+                if(sqlTemp == ''){
+                    alert('请输入SQL！');
+                    return false;
+                }
+            }
+
+            var trs = $('#params-table tbody tr');
+            for(var i=0;i<trs.length;i++){
+                var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                        value = trs.eq(i).find('input[name="value"]').val();
+                if(name == '' || value == ''){
+                    alert('请输入参数名称和值！');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        function getParams () {
+            var sqlText = $('.search textarea'),
+                    sql = '';
+            for(var i=0;i<sqlText.length;i++){
+                var sqlTemp = sqlText.eq(i).val();
+                if(i < sqlText.length-1){
+                    sql += sqlTemp +';';
+                }else{
+                    sql += sqlTemp;
+                }
+            }
+
+            var trs = $('#params-table tbody tr'),
+                    json = {};
+            for(var i=0;i<trs.length;i++){
+                var name = trs.eq(i).find('input[name="name"]').val().trim(),
+                        value = trs.eq(i).find('input[name="value"]').val(),
+                        selectType = trs.eq(i).find('select').val();
+                if(selectType == 1){
+                    value = Number(value);
+                }
+
+                //            sql语句类型需要在值中加入[sql]标注，方便后台处理
+                if(selectType==2){
+                    value=value+"[sql]";
+
+                }
+                json[name]=value;
+            }
+            var jsonStr = JSON.stringify(utils.fgetParamsArray(json));
+
+            var name = $('#name').val().trim(),
+                    description = $('#description').val(),
+                    id = $('#reportId').val();
+            var params = {
+                id:id,
+                name:name,
+                description:description,
+                opExpr:sql,
+                type:3,
+                paramsJson:jsonStr,
+                params:jsonStr,
+                sourceType:1
+            };
+            //    兼容redis模式，所有sql数据模板和redis的非单记录模板，sigleRedis都为1,单记录模板sigleRedis为2
+
+            params.singleRedis=1;
+
+            return params;
+        }
+
+        $('#sql-query').click(function(){
+            if(!validate()){
+                return;
+            }
+            var params = getParams();
+            jQuery.ajax({
+                url:'/report/getSqlData',
+                type:'POST',
+                data:params,
+                success:function(data){
+                    $('#data-conf').html(data);
+                    if($('.errorMsg').length == 0){
+                        $('#report-btn').closest('div').show();
+                    }else{
+                        $('#report-btn').closest('div').hide();
+                    }
+                },
+                error:function(){
+                    $('#data-conf').html("");
+                    alert('导入SQL失败！');
+                }
+            });
+
+        });
+
+        $('#report-btn').click(function() {
+            if(!validate()){
+                return;
+            }
+            var params = getParams();
+            jQuery.ajax({
+                url:'/report/doSaveReport',
+                type:'POST',
+                data:params,
+                dataType:'json',
+                success:function(data){
+                    if(data.success){
+                        alert('保存数据类型模板成功！将前往模板列表。');
+                        window.location.href = '/datas';
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+    })();
+</script>

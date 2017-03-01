@@ -1,0 +1,158 @@
+
+<div id="wbbb"></div>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>操作</th>
+            <th>标签</th>
+        </tr>
+    </thead>
+    <tbody>
+        #foreach($report in $!reports.result)
+            <tr>
+                <td>$!report.id</td>
+                <td>$!report.name</td>
+                <td style="width:30%;" templateid="$!report.id">
+                    #if($!report.type == 1)
+						#if($!report.state == 1)
+							<a href="/report/edit/$!{report.id}" title="查看模板基本属性" class="view-link">查看基本属性</a>
+							<a href="/report/editOption/$!{report.id}" title="查看模板option" class="view-link">查看option</a>
+						#elseif($!report.state == 2)
+							<a href="/report/edit/$!{report.id}" title="修改模板基本属性" class="view-link">修改基本属性</a>
+							<a href="/report/editOption/$!{report.id}" title="修改模板option" class="view-link">修改option</a>
+						#end
+                        <a href="/data/view/$!{report.id}" title="浏览模板" target="_blank" class="view-link">浏览</a>
+                    #elseif($!report.type == 3)
+                        #if($!report.state == 1)
+							<a href="/report/editTable/$!{report.id}" title="查看模板" class="view-link">查看</a>
+						#elseif($!report.state == 2)
+							<a href="/report/editTable/$!{report.id}" title="修改模板" class="view-link">修改</a>
+						#end
+					#end
+					#if($!report.state == 2)
+						<a href="javascript:void(0);" title="删除模板" class="view-link delete">删除</a>
+					#end
+					#if($!isAdmin == true || $!user == $!report.user)
+						<a href="javascript:void(0);" reportId="$!{report.id}" title="转换状态" class="view-link state-change">转换状态</a>
+					#end	
+                </td>
+                <td style="width:50%;">
+                    #foreach($tag in $!{report.tags})
+                       <div style="display: inline-block;" tagId=$!{tag.id} reportId=$!{report.id}>
+                         <span class="tag-span">$!{tag.name} </span>
+                        <a class="a-remove" href="javascript:void(0);" style="padding-right: 10px;">X</a>
+                       </div>
+                    #end
+                    <a class="add-tag"  style="float: right;" href="javascript:void(0); " reportId=$!{report.id}>增加</a>
+
+                </td>
+            </tr>
+        #end
+    </tbody>
+</table>
+<div class="pagination" style="float:right;" >
+    #showPage($!reports, 'queryList')
+</div>
+
+<script type="text/javascript">
+(function(){
+    $('.delete').click(function(){
+        if(confirm('确定删除该模板？')){
+            var id = $(this).closest('td').attr('templateid'),
+                url='/report/delete';
+            var params = {
+                id: id
+            };
+            DL.fdo(url, params, function(data){
+                if(data.success){
+                    alert('删除模板成功！');
+                    window.location.reload();
+                }else{
+                    alert('删除模板失败！'+data.message);
+                }
+            });
+        }
+    });
+    $('.state-change').click(function(){
+        var reportId=$(this).attr('reportId');
+        jQuery.ajax({
+            url:'/report/switchState/'+reportId,
+            dataType:'json',
+            success:function(){
+//                alert("成功转换");
+                window.location.reload();
+//                window.location.href='/report/list'
+            }
+        })
+
+
+
+    })
+
+    function initTagSelect(){
+        jQuery.ajax({
+            url:'/tag/getAll.html',
+            type:'POST',
+            dataType:'json',
+            success:function(data){
+
+                if(data.success){
+                    jQuery.each(data.tags,function(i,item){
+                        var ss='<input type="checkbox" class="cb" name="tags" style="height:18px; width:20px " value="'+item.id+'"/> '+item.name;
+                        console.log(ss);
+                        $('#tagDiv').children.remove();
+                        $('#tagDiv').append(ss);
+                    })
+                }else{
+                    alert("错误");
+                }
+            }
+
+        })
+
+
+    }
+
+    function sc1(DivId) {
+//        debugger
+        var ss=$(DivId);
+        var height=Math.round((window.screen.height-200)/2);
+        ss.css('position','fixed');
+    }
+
+
+    $('.a-remove').click(function(){
+        var tagId=$(this).closest('div').attr('tagId');
+        var reportId=$(this).closest('div').attr('reportId');
+        $(this).closest('div').remove();
+        var params={
+            tagId:tagId,
+            reportId:reportId
+        }
+        jQuery.ajax({
+            url: '/report/deleteTag',
+            data:params,
+            dataType:'json',
+            type:'POST'
+        })
+        initTagSelect()
+
+    })
+    $('.add-tag').click(function(){
+        var reportId=$(this).attr('reportId');
+      var   wBox=$('#wbbb').wBox({
+//            opacity:0,
+            requestType: "ajax",
+            title:"报表标签添加",
+            target:"/report/addTags?reportId="+reportId
+        });
+        wBox.showBox();
+        sc1('#wBox')
+
+    })
+
+
+})();
+</script>

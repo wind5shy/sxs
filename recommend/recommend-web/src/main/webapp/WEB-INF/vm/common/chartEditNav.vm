@@ -1,0 +1,10 @@
+<div class="well summary">
+    <ul>
+        <li class="current">
+            <a href="javascript:void(0);"><span class="count">1</span>查询信息配置</a>
+        </li>
+        <li class="last">
+            <a href="javascript:void(0);"><span class="count">2</span>报表类型选择</a>
+        </li>
+    </ul>
+</div>
